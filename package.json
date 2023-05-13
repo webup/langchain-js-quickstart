@@ -1,0 +1,20 @@
+{
+  "name": "langchain-js-lab",
+  "version": "0.1.0",
+  "description": "Quickstart with LangChain in JavaScript",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@pinecone-database/pinecone": "^0.1.5",
+    "axios": "^1.4.0",
+    "browser-or-node": "^2.1.1",
+    "cheerio": "1.0.0-rc.12",
+    "dotenv": "^16.0.3",
+    "langchain": "^0.0.75"
+  },
+  "devDependencies": {
+    "@types/node": "^20.1.3"
+  }
+}

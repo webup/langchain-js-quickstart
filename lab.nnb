@@ -1,0 +1,741 @@
+{
+    "cells": [
+        {
+            "language": "typescript",
+            "source": [
+                "// 加载 .env 中的所有环境变量\nimport 'dotenv/config';"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "text/plain",
+                            "value": [
+                                "{}"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "// 直接使用 OpenAI Model 完成一次提问\nimport { OpenAI } from \"langchain/llms/openai\";\n\nconst model = new OpenAI({\n  modelName: 'gpt-3.5-turbo',\n  temperature: 0.5,\n});\n\nawait model.call('怎么评价人工智能');"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "text/plain",
+                            "value": [
+                                "\u001b[32m'作为一个AI模型，我不能有任何偏见或评价。但是，人工智能可以帮助我们在许多领域取得进步和改进，例如医疗保健、交通、教育等。它可以帮助我们更快、更准确地进行决策和分析，同时也可以减少人类工作的重复性和单调性。但是，我们也需要警惕人工智能可能带来的负面影响，例如失业、隐私问题和人类价值观的冲击等。因此，我们需要在使用人工智能的过程中保持谨慎和透明，同时不断探索如何最大化其潜力，同时最小化其负面影响。'\u001b[39m"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "// 使用 Agent 通过 Google 搜索并返回答案\nimport { OpenAI } from 'langchain/llms/openai';\nimport { OpenAIEmbeddings } from 'langchain/embeddings/openai';\nimport { initializeAgentExecutorWithOptions } from 'langchain/agents';\nimport { SerpAPI } from 'langchain/tools';\nimport { Calculator } from 'langchain/tools/calculator';\nimport { WebBrowser } from 'langchain/tools/webbrowser';\n\n// 加载 OpenAI 模型\nconst model = new OpenAI({ temperature: 0 });\nconst embeddings = new OpenAIEmbeddings();\n\n// 加载 SerpAPI 工具\nconst tools = [\n  new SerpAPI(process.env.SERPAPI_API_KEY, {\n    location: 'Austin,Texas,United States',\n    hl: 'en',\n    gl: 'us',\n  }),\n  new Calculator(),\n  new WebBrowser({ model, embeddings }),\n];\n\n// 初始化 Agent，并加载工具\nconst executor = await initializeAgentExecutorWithOptions(tools, model, {\n  agentType: 'zero-shot-react-description',\n  verbose: true,\n});\nconsole.log('Loaded agent.');\n\nconst input = `What is the word of the day on merriam webster. What is the top result on google for that word`;\nconsole.log(`Executing with input \"${input}\"...`);\n\n// 执行 Agent\nawait executor.call({ input });"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "Loaded agent.",
+                                "Executing with input \"What is the word of the day on merriam webster. What is the top result on google for that word\"...",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:agent_executor > 2:chain:llm_chain > \u001b[1m3:llm:openai\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"Answer the following questions as best you can. You have access to the following tools:\\n\\nsearch: a search engine. useful for when you need to answer questions about current events. input should be a search query.\\ncalculator: Useful for getting the result of a math expression. The input to this tool should be a valid mathematical expression that could be executed by a simple calculator.\\nweb-browser: useful for when you need to find something on or summarize a webpage. input should be a comma separated list of \\\"ONE valid http URL including protocol\\\",\\\"what you want to find on the page or empty string for a summary\\\".\\n\\nUse the following format in your response:\\n\\nQuestion: the input question you must answer\\nThought: you should always think about what to do\\nAction: the action to take, should be one of [search,calculator,web-browser]\\nAction Input: the input to the action\\nObservation: the result of the action\\n... (this Thought/Action/Action Input/Observation can repeat N times)\\nThought: I now know the final answer\\nFinal Answer: the final answer to the original input question\\n\\nBegin!\\n\\nQuestion: What is the word of the day on merriam webster. What is the top result on google for that word\\nThought:\"",
+                                "  ]",
+                                "}",
+                                "\u001b[32m[tool/start]\u001b[39m [\u001b[90m1:chain:agent_executor > \u001b[1m4:tool:web-browser\u001b[22m\u001b[39m] Entering Tool run with input: \"https://www.merriam-webster.com/word-of-the-day\",\"",
+                                "/p1?refc=INLINE_WOD_MWU) Words at Play [ 12 political putdowns kakistocracy](https://www.merriam-webster.com/words-at-play/political-putdowns) 12 Political Putdowns For When 'Lowdown Crook' Isn't Specific Enough [ image2135812303](https://www.merriam-webster.com/words-at-play/letters-that-are-not-seen-but-are-heard-in-words#:~:text=This%20is%20quite%20a%20common,this%20type%20of%20alteration%20dissimilation.) Absent Letters That Are Heard Anyway When letters make sounds that aren't associated w... [ image1650711902](https://www.merriam-webster.com/words-at-play/that-sucks-vocabulary-replacements) Better Ways to Say \\\"This Sucks\\\" Go on...make your English teacher proud. [ merriam webster time\\n\\nI need a summary from the above text, also provide up to 5 markdown links from within that would be of interest (always including URL and text). Links should be provided, if present, in markdown syntax as a list under the heading \\\"Relevant Links:\\\".\"",
+                                "  ]",
+                                "}",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:agent_executor > 6:chain:llm_chain > \u001b[1m7:llm:openai\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"Answer the following questions as best you can. You have access to the following tools:\\n\\nsearch: a search engine. useful for when you need to answer questions about current events. input should be a search query.\\ncalculator: Useful for getting the result of a math expression. The input to this tool should be a valid mathematical expression that could be executed by a simple calculator.\\nweb-browser: useful for when you need to find something on or summarize a webpage. input should be a comma separated list of \\\"ONE valid http URL including protocol\\\",\\\"what you want to find on the page or empty string for a summary\\\".\\n\\nUse the following format in your response:\\n\\nQuestion: the input question you must answer\\nThought: you should always think about what to do\\nAction: the action to take, should be one of [search,calculator,web-browser]\\nAction Input: the input to the action\\nObservation: the result of the action\\n... (this Thought/Action/Action Input/Observation can repeat N times)\\nThought: I now know the final answer\\nFinal Answer: the final answer to the original input question\\n\\nBegin!\\n\\nQuestion: What is the word of the day on merriam webster. What is the top result on google for that word\\nThought: I need to find the word of the day on Merriam Webster and then search for it on Google\\nAction: web-browser\\nAction Input: \\\"https://www.merriam-webster.com/word-of-the-day\\\", \\\"\\\"\\nObservation: \\n\\nSummary: Merriam-Webster is a website that provides a variety of services, including a dictionary, thesaurus, word of the day, games and quizzes, and other features. It also provides a login feature for users to save words, view recents, and access their account settings. The word of the day is \\\"laden,\\\" which means heavily loaded with something. The website also provides quizzes and games to help users build their vocabulary. \\n\\nRelevant Links: \\n- [Test Your Vocabulary](https://www.merriam-webster.com/games) \\n- [Thesaurus](https://www.merriam-webster.com/thesaurus) \\n- [Word Finder](https://www.merriam-webster.com/wordfinder) \\n- [Word of the Day](https://www.merriam-webster.com/word-of-the-day) \\n- [Shop](https://shop.merriam-webster.com/?utm_source=mwsite&utm_medium=nav&utm_content=header)\\nThought:\"",
+                                "  ]",
+                                "}",
+                                "\u001b[32m[tool/start]\u001b[39m [\u001b[90m1:chain:agent_executor > \u001b[1m8:tool:search\u001b[22m\u001b[39m] Entering Tool run with input: \"laden\"",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:agent_executor > 9:chain:llm_chain > \u001b[1m10:llm:openai\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"Answer the following questions as best you can. You have access to the following tools:\\n\\nsearch: a search engine. useful for when you need to answer questions about current events. input should be a search query.\\ncalculator: Useful for getting the result of a math expression. The input to this tool should be a valid mathematical expression that could be executed by a simple calculator.\\nweb-browser: useful for when you need to find something on or summarize a webpage. input should be a comma separated list of \\\"ONE valid http URL including protocol\\\",\\\"what you want to find on the page or empty string for a summary\\\".\\n\\nUse the following format in your response:\\n\\nQuestion: the input question you must answer\\nThought: you should always think about what to do\\nAction: the action to take, should be one of [search,calculator,web-browser]\\nAction Input: the input to the action\\nObservation: the result of the action\\n... (this Thought/Action/Action Input/Observation can repeat N times)\\nThought: I now know the final answer\\nFinal Answer: the final answer to the original input question\\n\\nBegin!\\n\\nQuestion: What is the word of the day on merriam webster. What is the top result on google for that word\\nThought: I need to find the word of the day on Merriam Webster and then search for it on Google\\nAction: web-browser\\nAction Input: \\\"https://www.merriam-webster.com/word-of-the-day\\\", \\\"\\\"\\nObservation: \\n\\nSummary: Merriam-Webster is a website that provides a variety of services, including a dictionary, thesaurus, word of the day, games and quizzes, and other features. It also provides a login feature for users to save words, view recents, and access their account settings. The word of the day is \\\"laden,\\\" which means heavily loaded with something. The website also provides quizzes and games to help users build their vocabulary. \\n\\nRelevant Links: \\n- [Test Your Vocabulary](https://www.merriam-webster.com/games) \\n- [Thesaurus](https://www.merriam-webster.com/thesaurus) \\n- [Word Finder](https://www.merriam-webster.com/wordfinder) \\n- [Word of the Day](https://www.merriam-webster.com/word-of-the-day) \\n- [Shop](https://shop.merriam-webster.com/?utm_source=mwsite&utm_medium=nav&utm_content=header)\\nThought: Now I need to search for the word of the day on Google\\nAction: search\\nAction Input: \\\"laden\\\"\\nObservation: Osama bin Mohammed bin Awad bin Laden was a Saudi Arabian-born militant and founder of the pan-Islamic militant organization Al-Qaeda. The group is designated as a terrorist group by the United Nations Security Council, the North Atlantic Treaty Organization, the European Union, and various other countries.\\nThought:\"",
+                                "  ]",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m1:chain:agent_executor > \u001b[1m9:chain:llm_chain\u001b[22m\u001b[39m] [4.45s] Exiting Chain run with output: {",
+                                "  \"text\": \" I now know the final answer\\nFinal Answer: Osama bin Mohammed bin Awad bin Laden is the top result on Google for the word of the day \\\"laden\\\" on Merriam Webster.\"",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m\u001b[1m1:chain:agent_executor\u001b[22m\u001b[39m] [53.20s] Exiting Chain run with output: {",
+                                "  \"output\": \"Osama bin Mohammed bin Awad bin Laden is the top result on Google for the word of the day \\\"laden\\\" on Merriam Webster.\"",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "text/plain",
+                            "value": [
+                                "{",
+                                "  output: \u001b[32m'Osama bin Mohammed bin Awad bin Laden is the top result on Google for the word of the day \"laden\" on Merriam Webster.'\u001b[39m",
+                                "}"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "// 使用 Text Loader 对超长文本进行总结和问答\nimport { OpenAI } from 'langchain/llms/openai';\nimport { TextLoader } from 'langchain/document_loaders/fs/text';\nimport { loadSummarizationChain, loadQARefineChain } from 'langchain/chains';\nimport { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';\n\n// 初始化文本分割器\nconst splitter = new RecursiveCharacterTextSplitter({\n  chunkSize: 500,\n  chunkOverlap: 0,\n});\n\n// 导入文本\nconst loader = new TextLoader('data/large_text.txt');\nconst docs = await loader.loadAndSplit(splitter);\nconsole.log('[ # of split documents ] >', docs.length);\n\n// 加载 OpenAI 模型\nconst model = new OpenAI({ maxTokens: 1500 });\n\n// 创建并执行总结链（为了快速演示，只总结前 3 段）\nconst chainSum = loadSummarizationChain(model, {\n  type: 'refine',\n  verbose: true,\n});\nconst summary = await chainSum.call({\n  input_documents: docs.slice(0, 3),\n});\nconsole.log('[ summary ] >', summary)\n\n// 创建并执行问答链（为了快速演示，只查询前 3 段）\nconst chainQA = loadQARefineChain(model);\nconst answer = await chainQA.call({\n  input_documents: docs.slice(0, 3),\n  question: '秦逸是谁？',\n});\nconsole.log('[ answer ] >', answer)"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "[ # of split documents ] > 360",
+                                "\u001b[32m[chain/start]\u001b[39m [\u001b[90m1:chain:refine_documents_chain > \u001b[1m2:chain:llm_chain\u001b[22m\u001b[39m] Entering Chain run with input: {",
+                                "  \"text\": \"声明：本书为爱奇电子书(www.i7wu.cn)的用户上传至其在本站的存储空间，本站只提供TXT全集电子书存储服务以及免费下载服务，以下作品内容之版权与本站无任何关系。\\n---------------------------用户上传之内容开始--------------------------------\\n《地藏心经》\\n作者：铸剑师无名\\n\\n\\n正文\"",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m1:chain:refine_documents_chain > \u001b[1m4:chain:llm_chain\u001b[22m\u001b[39m] [12.15s] Exiting Chain run with output: {",
+                                "  \"text\": \"\\nThis book is uploaded by users to the storage space of i7wu.cn, a website that only provides TXT full set e-book storage and free download services. The copyright of the following works has no relation with the website. The book is called \\\"地藏心经\\\" and is written by 铸剑师无名. It tells the story of the Lu family, who rose to power in the Jiangnan region, through their business in the trading of furs from the northwest. Over the course of a century, the Lu family produced many talented individuals, and eventually controlled the military forces in the regions of Yu and Yu. After a decade, the southern dynasty was nearly powerless and the regions were split into various factions, all under the control of the Lu family.\"",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m1:chain:refine_documents_chain > \u001b[1m6:chain:llm_chain\u001b[22m\u001b[39m] [14.44s] Exiting Chain run with output: {",
+                                "  \"text\": \" \\nThis book is uploaded by users to the storage space of i7wu.cn, a website that only provides TXT full set e-book storage and free download services. The copyright of the following works has no relation with the website. The book is called \\\"地藏心经\\\" and is written by 铸剑师无名. It tells the story of the Lu family, who rose to power in the Jiangnan region, through their business in the trading of furs from the northwest. Over the course of a century, the Lu family produced many talented individuals and eventually controlled the military forces in the regions of Yu and Yu. This caused the southern dynasty to become nearly powerless, leading to the regions being split into various factions, all under the control of the Lu family. The Lu family was able to establish dominance over the other families in the area, including the Deng, Li, Su, He, and Gongsun families in the northwest, the Lu, Xiong, Liu, and Zheng families in the south, and the three provinces in the east. They were even able to secure a boat from the Lu family's car business in Yuzhou, despite their weakened status.\"",
+                                "}",
+                                "[ summary ] > {",
+                                "  output_text: ' \\n' +",
+                                "    `This book is uploaded by users to the storage space of i7wu.cn, a website that only provides TXT full set e-book storage and free download services. The copyright of the following works has no relation with the website. The book is called \"地藏心经\" and is written by 铸剑师无名. It tells the story of the Lu family, who rose to power in the Jiangnan region, through their business in the trading of furs from the northwest. Over the course of a century, the Lu family produced many talented individuals and eventually controlled the military forces in the regions of Yu and Yu. This caused the southern dynasty to become nearly powerless, leading to the regions being split into various factions, all under the control of the Lu family. The Lu family was able to establish dominance over the other families in the area, including the Deng, Li, Su, He, and Gongsun families in the northwest, the Lu, Xiong, Liu, and Zheng families in the south, and the three provinces in the east. They were even able to secure a boat from the Lu family's car business in Yuzhou, despite their weakened status.`",
+                                "}",
+                                "[ answer ] > {",
+                                "  output_text: '\\n' +",
+                                "    '\\n' +",
+                                "    '秦逸是虚构的人物，是《地藏心经》中的主角，由铸剑师无名创作。他是一位苦读诗书的学士，他的家庭来自西北，与渝州陆家无关。但是在渝州，秦家早已家道中落，与陆家比不得，不敢与其争船。'",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "Error in handler ConsoleCallbackHandler, handleChainStart: Error: Parent run 069f9ad0-ca6a-401e-a353-2b87ea07d1e0 not found",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:refine_documents_chain > 2:chain:llm_chain > \u001b[1m3:llm:openai\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"Write a concise summary of the following:\\n\\n\\n\\\"声明：本书为爱奇电子书(www.i7wu.cn)的用户上传至其在本站的存储空间，本站只提供TXT全集电子书存储服务以及免费下载服务，以下作品内容之版权与本站无任何关系。\\n---------------------------用户上传之内容开始--------------------------------\\n《地藏心经》\\n作者：铸剑师无名\\n\\n\\n正文\\\"\\n\\n\\nCONCISE SUMMARY:\"",
+                                "  ]",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "Error in handler ConsoleCallbackHandler, handleLLMStart: Error: Parent run db08f40a-827a-4297-afe0-a7bfb8390e51 not found",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "\u001b[36m[llm/end]\u001b[39m [\u001b[90m1:chain:refine_documents_chain > 2:chain:llm_chain > \u001b[1m3:llm:openai\u001b[22m\u001b[39m] [7.11s] Exiting LLM run with output: {",
+                                "  \"generations\": [",
+                                "    [",
+                                "      {",
+                                "        \"text\": \" \\nThis book is uploaded by users to the storage space of i7wu.cn, a website that only provides TXT full set e-book storage and free download services. The copyright of the following works has no relation with the website. The book is called \\\"地藏心经\\\" and is written by 铸剑师无名.\",",
+                                "        \"generationInfo\": {",
+                                "          \"finishReason\": \"stop\",",
+                                "          \"logprobs\": null",
+                                "        }",
+                                "      }",
+                                "    ]",
+                                "  ],",
+                                "  \"llmOutput\": {",
+                                "    \"tokenUsage\": {",
+                                "      \"completionTokens\": 82,",
+                                "      \"promptTokens\": 229,",
+                                "      \"totalTokens\": 311",
+                                "    }",
+                                "  }",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "Error in handler ConsoleCallbackHandler, handleLLMEnd: Error: No LLM run to end.",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m1:chain:refine_documents_chain > \u001b[1m2:chain:llm_chain\u001b[22m\u001b[39m] [7.11s] Exiting Chain run with output: {",
+                                "  \"text\": \" \\nThis book is uploaded by users to the storage space of i7wu.cn, a website that only provides TXT full set e-book storage and free download services. The copyright of the following works has no relation with the website. The book is called \\\"地藏心经\\\" and is written by 铸剑师无名.\"",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "Error in handler ConsoleCallbackHandler, handleChainEnd: Error: No chain run to end.",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "\u001b[32m[chain/start]\u001b[39m [\u001b[90m1:chain:refine_documents_chain > \u001b[1m4:chain:llm_chain\u001b[22m\u001b[39m] Entering Chain run with input: {",
+                                "  \"existing_answer\": \" \\nThis book is uploaded by users to the storage space of i7wu.cn, a website that only provides TXT full set e-book storage and free download services. The copyright of the following works has no relation with the website. The book is called \\\"地藏心经\\\" and is written by 铸剑师无名.\",",
+                                "  \"text\": \"第一第十五章 天下势，渡江（一）\\n    “渝州陆家？！”\\n    虽然原本的那个秦逸，每日只知道苦读诗书，从未与商贾们打过交道，但是渝州陆家的名声，他还是知道。\\n    陆家三代为官，官至两江总督，五代经商，百年经营，家私何止千万，直至今朝，俨然已是江南一等士族大户。渝州陆氏以皮货起家，乃是西北之地数得上号的商户，西北之地所产的皮货，有三成经他们之手卖往江南。\\n    若只是如此，陆氏也不过是一头肥硕的羔羊，只待他人宰杀。\\n    陆氏三代家主都极具雄韬伟略，以千金买官，以万金开路，更是在蛮夷南侵之时，倾尽家资招兵买马，拒十万蛮夷铁骑于侯关外，短短三年间，便一手扶持起了都护大将军——苏和，抗夷大将军——邓昌。\\n    以姻亲握住兵权后，陆氏子弟一路仕途平坦，百年来，人才辈出，更有陆云，陆羽等良将贤才。\\n    而今，已是雄踞渝、豫两地的世家阀门，这江南数万水军，便是掌握在这一代的陆家族长手中。\\n    朝廷无权，皇帝无兵，短短十年，南朝便形同虚设，各地封疆大使，世家阀门手握重兵，除了京都三省还在南朝皇族手中，其他俨然已经分地而治。\"",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "Error in handler ConsoleCallbackHandler, handleChainStart: Error: Parent run 069f9ad0-ca6a-401e-a353-2b87ea07d1e0 not found",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:refine_documents_chain > 4:chain:llm_chain > \u001b[1m5:llm:openai\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"Your job is to produce a final summary\\nWe have provided an existing summary up to a certain point: \\\" \\nThis book is uploaded by users to the storage space of i7wu.cn, a website that only provides TXT full set e-book storage and free download services. The copyright of the following works has no relation with the website. The book is called \\\"地藏心经\\\" and is written by 铸剑师无名.\\\"\\nWe have the opportunity to refine the existing summary\\n(only if needed) with some more context below.\\n------------\\n\\\"第一第十五章 天下势，渡江（一）\\n    “渝州陆家？！”\\n    虽然原本的那个秦逸，每日只知道苦读诗书，从未与商贾们打过交道，但是渝州陆家的名声，他还是知道。\\n    陆家三代为官，官至两江总督，五代经商，百年经营，家私何止千万，直至今朝，俨然已是江南一等士族大户。渝州陆氏以皮货起家，乃是西北之地数得上号的商户，西北之地所产的皮货，有三成经他们之手卖往江南。\\n    若只是如此，陆氏也不过是一头肥硕的羔羊，只待他人宰杀。\\n    陆氏三代家主都极具雄韬伟略，以千金买官，以万金开路，更是在蛮夷南侵之时，倾尽家资招兵买马，拒十万蛮夷铁骑于侯关外，短短三年间，便一手扶持起了都护大将军——苏和，抗夷大将军——邓昌。\\n    以姻亲握住兵权后，陆氏子弟一路仕途平坦，百年来，人才辈出，更有陆云，陆羽等良将贤才。\\n    而今，已是雄踞渝、豫两地的世家阀门，这江南数万水军，便是掌握在这一代的陆家族长手中。\\n    朝廷无权，皇帝无兵，短短十年，南朝便形同虚设，各地封疆大使，世家阀门手握重兵，除了京都三省还在南朝皇族手中，其他俨然已经分地而治。\\\"\\n------------\\n\\nGiven the new context, refine the original summary\\nIf the context isn't useful, return the original summary.\\n\\nREFINED SUMMARY:\"",
+                                "  ]",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "Error in handler ConsoleCallbackHandler, handleLLMStart: Error: Parent run ae4beb07-eff5-4b4a-af42-b2d84dfffa2e not found",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "\u001b[36m[llm/end]\u001b[39m [\u001b[90m1:chain:refine_documents_chain > 4:chain:llm_chain > \u001b[1m5:llm:openai\u001b[22m\u001b[39m] [12.15s] Exiting LLM run with output: {",
+                                "  \"generations\": [",
+                                "    [",
+                                "      {",
+                                "        \"text\": \"\\nThis book is uploaded by users to the storage space of i7wu.cn, a website that only provides TXT full set e-book storage and free download services. The copyright of the following works has no relation with the website. The book is called \\\"地藏心经\\\" and is written by 铸剑师无名. It tells the story of the Lu family, who rose to power in the Jiangnan region, through their business in the trading of furs from the northwest. Over the course of a century, the Lu family produced many talented individuals, and eventually controlled the military forces in the regions of Yu and Yu. After a decade, the southern dynasty was nearly powerless and the regions were split into various factions, all under the control of the Lu family.\",",
+                                "        \"generationInfo\": {",
+                                "          \"finishReason\": \"stop\",",
+                                "          \"logprobs\": null",
+                                "        }",
+                                "      }",
+                                "    ]",
+                                "  ],",
+                                "  \"llmOutput\": {",
+                                "    \"tokenUsage\": {",
+                                "      \"completionTokens\": 170,",
+                                "      \"promptTokens\": 1127,",
+                                "      \"totalTokens\": 1297",
+                                "    }",
+                                "  }",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "Error in handler ConsoleCallbackHandler, handleLLMEnd: Error: No LLM run to end.",
+                                "Error in handler ConsoleCallbackHandler, handleChainEnd: Error: No chain run to end.",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "\u001b[32m[chain/start]\u001b[39m [\u001b[90m1:chain:refine_documents_chain > \u001b[1m6:chain:llm_chain\u001b[22m\u001b[39m] Entering Chain run with input: {",
+                                "  \"existing_answer\": \"\\nThis book is uploaded by users to the storage space of i7wu.cn, a website that only provides TXT full set e-book storage and free download services. The copyright of the following works has no relation with the website. The book is called \\\"地藏心经\\\" and is written by 铸剑师无名. It tells the story of the Lu family, who rose to power in the Jiangnan region, through their business in the trading of furs from the northwest. Over the course of a century, the Lu family produced many talented individuals, and eventually controlled the military forces in the regions of Yu and Yu. After a decade, the southern dynasty was nearly powerless and the regions were split into various factions, all under the control of the Lu family.\",",
+                                "  \"text\": \"西北，邓、李、苏、何、公孙五家世家阀门割据一方，联手共抗蛮夷合并后的金国。\\n    南方，陆、熊、刘、郑四家百年士族据守江南，与中山国相持已然数十载。\\n    东方，京都三省雄兵三十万，黑甲铁骑八千，时刻防范着秦国有所异动。（备注：黑甲铁骑配备长枪，马刀，黑铁重甲，所乘骑的乃是西域宛马，是南朝立国时便赫赫有名的百战铁骑。曾以八千黑甲铁骑破中山国十万雄兵而名动天下。）\\n    这些，便是张狂融合完原本那个‘秦逸’的记忆，而整理出的天下大势。\\n    **************************************************************************\\n    “少爷。这船都被陆家车行的人包下了。”\\n    不过一会儿，秦汉便略显沮丧地走了回来。渝州陆家势大，而今就连附属下面的陆家车行，身份也是水涨船高。自从秦逸父亲病逝后，秦家家道中落，与陆家比不得，况且此地也并非西北所属，秦家纵然还有些人脉，却也用不上。\\n    所以，为了避免麻烦，他也没敢去与陆家争船。\"",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "Error in handler ConsoleCallbackHandler, handleChainStart: Error: Parent run 069f9ad0-ca6a-401e-a353-2b87ea07d1e0 not found",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:refine_documents_chain > 6:chain:llm_chain > \u001b[1m7:llm:openai\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"Your job is to produce a final summary\\nWe have provided an existing summary up to a certain point: \\\"\\nThis book is uploaded by users to the storage space of i7wu.cn, a website that only provides TXT full set e-book storage and free download services. The copyright of the following works has no relation with the website. The book is called \\\"地藏心经\\\" and is written by 铸剑师无名. It tells the story of the Lu family, who rose to power in the Jiangnan region, through their business in the trading of furs from the northwest. Over the course of a century, the Lu family produced many talented individuals, and eventually controlled the military forces in the regions of Yu and Yu. After a decade, the southern dynasty was nearly powerless and the regions were split into various factions, all under the control of the Lu family.\\\"\\nWe have the opportunity to refine the existing summary\\n(only if needed) with some more context below.\\n------------\\n\\\"西北，邓、李、苏、何、公孙五家世家阀门割据一方，联手共抗蛮夷合并后的金国。\\n    南方，陆、熊、刘、郑四家百年士族据守江南，与中山国相持已然数十载。\\n    东方，京都三省雄兵三十万，黑甲铁骑八千，时刻防范着秦国有所异动。（备注：黑甲铁骑配备长枪，马刀，黑铁重甲，所乘骑的乃是西域宛马，是南朝立国时便赫赫有名的百战铁骑。曾以八千黑甲铁骑破中山国十万雄兵而名动天下。）\\n    这些，便是张狂融合完原本那个‘秦逸’的记忆，而整理出的天下大势。\\n    **************************************************************************\\n    “少爷。这船都被陆家车行的人包下了。”\\n    不过一会儿，秦汉便略显沮丧地走了回来。渝州陆家势大，而今就连附属下面的陆家车行，身份也是水涨船高。自从秦逸父亲病逝后，秦家家道中落，与陆家比不得，况且此地也并非西北所属，秦家纵然还有些人脉，却也用不上。\\n    所以，为了避免麻烦，他也没敢去与陆家争船。\\\"\\n------------\\n\\nGiven the new context, refine the original summary\\nIf the context isn't useful, return the original summary.\\n\\nREFINED SUMMARY:\"",
+                                "  ]",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "Error in handler ConsoleCallbackHandler, handleLLMStart: Error: Parent run fc151a25-f6cd-4309-87ed-ca73753af012 not found",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "\u001b[36m[llm/end]\u001b[39m [\u001b[90m1:chain:refine_documents_chain > 6:chain:llm_chain > \u001b[1m7:llm:openai\u001b[22m\u001b[39m] [14.44s] Exiting LLM run with output: {",
+                                "  \"generations\": [",
+                                "    [",
+                                "      {",
+                                "        \"text\": \" \\nThis book is uploaded by users to the storage space of i7wu.cn, a website that only provides TXT full set e-book storage and free download services. The copyright of the following works has no relation with the website. The book is called \\\"地藏心经\\\" and is written by 铸剑师无名. It tells the story of the Lu family, who rose to power in the Jiangnan region, through their business in the trading of furs from the northwest. Over the course of a century, the Lu family produced many talented individuals and eventually controlled the military forces in the regions of Yu and Yu. This caused the southern dynasty to become nearly powerless, leading to the regions being split into various factions, all under the control of the Lu family. The Lu family was able to establish dominance over the other families in the area, including the Deng, Li, Su, He, and Gongsun families in the northwest, the Lu, Xiong, Liu, and Zheng families in the south, and the three provinces in the east. They were even able to secure a boat from the Lu family's car business in Yuzhou, despite their weakened status.\",",
+                                "        \"generationInfo\": {",
+                                "          \"finishReason\": \"stop\",",
+                                "          \"logprobs\": null",
+                                "        }",
+                                "      }",
+                                "    ]",
+                                "  ],",
+                                "  \"llmOutput\": {",
+                                "    \"tokenUsage\": {",
+                                "      \"completionTokens\": 253,",
+                                "      \"promptTokens\": 1034,",
+                                "      \"totalTokens\": 1287",
+                                "    }",
+                                "  }",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "Error in handler ConsoleCallbackHandler, handleLLMEnd: Error: No LLM run to end.",
+                                "Error in handler ConsoleCallbackHandler, handleChainEnd: Error: No chain run to end.",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m\u001b[1m1:chain:refine_documents_chain\u001b[22m\u001b[39m] [33.70s] Exiting Chain run with output: {",
+                                "  \"output_text\": \" \\nThis book is uploaded by users to the storage space of i7wu.cn, a website that only provides TXT full set e-book storage and free download services. The copyright of the following works has no relation with the website. The book is called \\\"地藏心经\\\" and is written by 铸剑师无名. It tells the story of the Lu family, who rose to power in the Jiangnan region, through their business in the trading of furs from the northwest. Over the course of a century, the Lu family produced many talented individuals and eventually controlled the military forces in the regions of Yu and Yu. This caused the southern dynasty to become nearly powerless, leading to the regions being split into various factions, all under the control of the Lu family. The Lu family was able to establish dominance over the other families in the area, including the Deng, Li, Su, He, and Gongsun families in the northwest, the Lu, Xiong, Liu, and Zheng families in the south, and the three provinces in the east. They were even able to secure a boat from the Lu family's car business in Yuzhou, despite their weakened status.\"",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "// 使用内存向量索引数据库构建问答机器人\nimport { OpenAI } from 'langchain/llms/openai';\nimport { OpenAIEmbeddings } from 'langchain/embeddings/openai';\nimport { TextLoader } from 'langchain/document_loaders/fs/text';\nimport { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';\nimport { MemoryVectorStore } from 'langchain/vectorstores/memory';\nimport { VectorDBQAChain } from 'langchain/chains';\n\n// 初始化文本分割器\nconst splitter = new RecursiveCharacterTextSplitter({\n  chunkSize: 500,\n  chunkOverlap: 0,\n});\n\n// 导入文本\nconst loader = new TextLoader('data/large_text.txt');\nconst docs = await loader.loadAndSplit(splitter);\nconsole.log('[ # of split documents ] >', docs.length);\n\n// 加载 OpenAI 模型\nconst model = new OpenAI();\nconst embeddings = new OpenAIEmbeddings();\n\n// 创建向量索引数据库（为了快速演示，只导入前 10 段）\nconst vectorStore = await MemoryVectorStore.fromDocuments(docs.slice(0, 10), embeddings);\n\n// 创建并执行问答链\nconst chain = VectorDBQAChain.fromLLM(model, vectorStore, {\n  k: 1,\n  returnSourceDocuments: true,\n  verbose: true,\n});\nawait chain.call({ query: '秦逸是谁？' });"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "[ # of documents ] > 360",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "text/plain",
+                            "value": [
+                                "{",
+                                "  text: \u001b[32m' 秦逸是秦家少爷，一个晋中秦家的家族成员。'\u001b[39m,",
+                                "  sourceDocuments: [",
+                                "    Document {",
+                                "      pageContent: \u001b[32m'“敢问，可是秦逸公子？！”中年商人对着秦逸又是一个大礼，声音颇为颤抖地说道。此番回程，他便听说了秦家少爷要前往渝州，却想不到自己居然正好遇上！\\n'\u001b[39m +",
+                                "        \u001b[32m'    “五代行善，何其不易！夫天下之人，独晋中秦家也！”……\\n'\u001b[39m +",
+                                "        \u001b[32m'    秦家善名，至今已然百年有余。\\n'\u001b[39m +",
+                                "        \u001b[32m'    “嗯。”秦逸点头，并未多说。一路行来，他已经陆续感受到了秦家在这个世界上的声望。\\n'\u001b[39m +",
+                                "        \u001b[32m'    一世行善容易，但是五代行善，中原数千年来，独此一家。就连数十年前，蛮夷赫连氏族入侵中原，都刻意避开了晋中秦家。在草原蛮族的教义中，屠戮真正的善人，会被狼神抛弃，灵魂永世不得安息。\\n'\u001b[39m +",
+                                "        \u001b[32m'    ************************************************************************\\n'\u001b[39m +",
+                                "        \u001b[32m'    就在秦逸准备寻一处清净地，安安静静的等待陆家车行的人先走时，远处，一团人簇拥着一个青衫老者往这边走来。而为首的，正是昨日在路上遇到的那个满脸扎须的壮年汉子。\\n'\u001b[39m +",
+                                "        \u001b[32m'    “那便是陆家车行的管事。”一旁的中年商人适时的报出了那位青衫老者的身份。\\n'\u001b[39m +",
+                                "        \u001b[32m'    “陆氏车行？管事？”'\u001b[39m,",
+                                "      metadata: \u001b[36m[Object]\u001b[39m",
+                                "    }",
+                                "  ]",
+                                "}"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "// 使用 Pinecone 向量索引库构建问答机器人\nimport { OpenAI } from 'langchain/llms/openai';\nimport { OpenAIEmbeddings } from 'langchain/embeddings/openai';\nimport { TextLoader } from 'langchain/document_loaders/fs/text';\nimport { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';\nimport { VectorDBQAChain } from 'langchain/chains';\nimport { PineconeStore } from 'langchain/vectorstores/pinecone';\nimport { PineconeClient } from '@pinecone-database/pinecone';\n\n// 初始化文本分割器\nconst splitter = new RecursiveCharacterTextSplitter({\n  chunkSize: 500,\n  chunkOverlap: 0,\n});\n\n// 导入文本\nconst loader = new TextLoader('data/large_text.txt');\nconst docs = await loader.loadAndSplit(splitter);\nconsole.log('[ # of split documents ] >', docs.length);\n\n// 加载 OpenAI 模型\nconst model = new OpenAI();\nconst embeddings = new OpenAIEmbeddings();\n\n// 初始化 Pinecone\nconst client = new PineconeClient();\nawait client.init({\n  apiKey: process.env.PINECONE_API_KEY!,\n  environment: process.env.PINECONE_ENVIRONMENT!,\n});\nconst pineconeIndex = client.Index(process.env.PINECONE_INDEX!);\n\n// 向 Pinecone 导入数据（为了快速演示，只导入前 10 段）\n// await PineconeStore.fromDocuments(docs.slice(0, 10), embeddings, {\n//   pineconeIndex,\n// });\n\n// 初始化向量索引\nconst vectorStore = await PineconeStore.fromExistingIndex(embeddings, { pineconeIndex });\n\n// 创建并执行问答链\nconst chain = VectorDBQAChain.fromLLM(model, vectorStore, {\n  k: 1,\n  returnSourceDocuments: true,\n  verbose: true,\n});\nawait chain.call({ query: '秦逸是谁？' });"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "[ # of split documents ] > 360",
+                                "\u001b[32m[chain/start]\u001b[39m [\u001b[90m\u001b[1m1:chain:vector_db_qa\u001b[22m\u001b[39m] Entering Chain run with input: {",
+                                "  \"query\": \"秦逸是谁？\"",
+                                "}",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:vector_db_qa > 2:chain:stuff_documents_chain > 3:chain:llm_chain > \u001b[1m4:llm:openai\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.\\n\\n“敢问，可是秦逸公子？！”中年商人对着秦逸又是一个大礼，声音颇为颤抖地说道。此番回程，他便听说了秦家少爷要前往渝州，却想不到自己居然正好遇上！\\n    “五代行善，何其不易！夫天下之人，独晋中秦家也！”……\\n    秦家善名，至今已然百年有余。\\n    “嗯。”秦逸点头，并未多说。一路行来，他已经陆续感受到了秦家在这个世界上的声望。\\n    一世行善容易，但是五代行善，中原数千年来，独此一家。就连数十年前，蛮夷赫连氏族入侵中原，都刻意避开了晋中秦家。在草原蛮族的教义中，屠戮真正的善人，会被狼神抛弃，灵魂永世不得安息。\\n    ************************************************************************\\n    就在秦逸准备寻一处清净地，安安静静的等待陆家车行的人先走时，远处，一团人簇拥着一个青衫老者往这边走来。而为首的，正是昨日在路上遇到的那个满脸扎须的壮年汉子。\\n    “那便是陆家车行的管事。”一旁的中年商人适时的报出了那位青衫老者的身份。\\n    “陆氏车行？管事？”\\n\\nQuestion: 秦逸是谁？\\nHelpful Answer:\"",
+                                "  ]",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m\u001b[1m1:chain:vector_db_qa\u001b[22m\u001b[39m] [6.17s] Exiting Chain run with output: {",
+                                "  \"text\": \" 秦逸是晋中秦家的少爷，他正在前往渝州。\",",
+                                "  \"sourceDocuments\": [",
+                                "    {",
+                                "      \"pageContent\": \"“敢问，可是秦逸公子？！”中年商人对着秦逸又是一个大礼，声音颇为颤抖地说道。此番回程，他便听说了秦家少爷要前往渝州，却想不到自己居然正好遇上！\\n    “五代行善，何其不易！夫天下之人，独晋中秦家也！”……\\n    秦家善名，至今已然百年有余。\\n    “嗯。”秦逸点头，并未多说。一路行来，他已经陆续感受到了秦家在这个世界上的声望。\\n    一世行善容易，但是五代行善，中原数千年来，独此一家。就连数十年前，蛮夷赫连氏族入侵中原，都刻意避开了晋中秦家。在草原蛮族的教义中，屠戮真正的善人，会被狼神抛弃，灵魂永世不得安息。\\n    ************************************************************************\\n    就在秦逸准备寻一处清净地，安安静静的等待陆家车行的人先走时，远处，一团人簇拥着一个青衫老者往这边走来。而为首的，正是昨日在路上遇到的那个满脸扎须的壮年汉子。\\n    “那便是陆家车行的管事。”一旁的中年商人适时的报出了那位青衫老者的身份。\\n    “陆氏车行？管事？”\",",
+                                "      \"metadata\": {",
+                                "        \"loc.lines.from\": 34,",
+                                "        \"loc.lines.to\": 42,",
+                                "        \"source\": \"data/large_text.txt\"",
+                                "      }",
+                                "    }",
+                                "  ]",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "text/plain",
+                            "value": [
+                                "{",
+                                "  text: \u001b[32m' 秦逸是晋中秦家的少爷，他正在前往渝州。'\u001b[39m,",
+                                "  sourceDocuments: [",
+                                "    Document {",
+                                "      pageContent: \u001b[32m'“敢问，可是秦逸公子？！”中年商人对着秦逸又是一个大礼，声音颇为颤抖地说道。此番回程，他便听说了秦家少爷要前往渝州，却想不到自己居然正好遇上！\\n'\u001b[39m +",
+                                "        \u001b[32m'    “五代行善，何其不易！夫天下之人，独晋中秦家也！”……\\n'\u001b[39m +",
+                                "        \u001b[32m'    秦家善名，至今已然百年有余。\\n'\u001b[39m +",
+                                "        \u001b[32m'    “嗯。”秦逸点头，并未多说。一路行来，他已经陆续感受到了秦家在这个世界上的声望。\\n'\u001b[39m +",
+                                "        \u001b[32m'    一世行善容易，但是五代行善，中原数千年来，独此一家。就连数十年前，蛮夷赫连氏族入侵中原，都刻意避开了晋中秦家。在草原蛮族的教义中，屠戮真正的善人，会被狼神抛弃，灵魂永世不得安息。\\n'\u001b[39m +",
+                                "        \u001b[32m'    ************************************************************************\\n'\u001b[39m +",
+                                "        \u001b[32m'    就在秦逸准备寻一处清净地，安安静静的等待陆家车行的人先走时，远处，一团人簇拥着一个青衫老者往这边走来。而为首的，正是昨日在路上遇到的那个满脸扎须的壮年汉子。\\n'\u001b[39m +",
+                                "        \u001b[32m'    “那便是陆家车行的管事。”一旁的中年商人适时的报出了那位青衫老者的身份。\\n'\u001b[39m +",
+                                "        \u001b[32m'    “陆氏车行？管事？”'\u001b[39m,",
+                                "      metadata: \u001b[36m[Object]\u001b[39m",
+                                "    }",
+                                "  ]",
+                                "}"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "// 使用 Zapier NLA 发送邮件\nimport { OpenAI } from 'langchain/llms/openai';\nimport { ZapierNLAWrapper } from 'langchain/tools';\nimport { initializeAgentExecutorWithOptions, ZapierToolKit } from 'langchain/agents';\n\n// 初始化 OpenAI 模型\nconst model = new OpenAI({ temperature: 0 });\n\n// 初始化 Zapier NLA 工具集\nconst zapier = new ZapierNLAWrapper();\nconst toolkit = await ZapierToolKit.fromZapierNLAWrapper(zapier);\n\nconst executor = await initializeAgentExecutorWithOptions(toolkit.tools, model, {\n  agentType: 'zero-shot-react-description',\n  verbose: true,\n});\nconsole.log('Agent loaded with below tools:');\n\n// 查看已经在 Zapier 中配置的工具\ntoolkit.tools.forEach((tool) => {\n  console.log('[ tool.name ] >', tool.name);\n  console.log('[ tool.description ] >', tool.description);\n})\n\n// 启动代理执行命令\nconst input = `请总结最后一封\"jsw@peterc.org\"发给我的邮件。并将总结翻译成中文后发送给\"zhanghaili@gmail.com\"`;\nconsole.log(`Executing with input \"${input}\"...`);\n\nawait executor.call({ input });\n"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "Agent loaded with below tools:",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:agent_executor > 2:chain:llm_chain > \u001b[1m3:llm:openai\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"Answer the following questions as best you can. You have access to the following tools:\\n\\nGmail: Send Email: A wrapper around Zapier NLA actions. The input to this tool is a natural language instruction, for example \\\"get the latest email from my bank\\\" or \\\"send a slack message to the #general channel\\\". Each tool will have params associated with it that are specified as a list. You MUST take into account the params when creating the instruction. For example, if the params are ['Message_Text', 'Channel'], your instruction should be something like 'send a slack message to the #general channel with the text hello world'. Another example: if the params are ['Calendar', 'Search_Term'], your instruction should be something like 'find the meeting in my personal calendar at 3pm'. Do not make up params, they will be explicitly specified in the tool description. If you do not have enough information to fill in the params, just say 'not enough information provided in the instruction, missing <param>'. If you get a none or null response, STOP EXECUTION, do not try to another tool! This tool specifically used for: Gmail: Send Email, and has params: [\\\"To\\\",\\\"Body\\\",\\\"Subject\\\",\\\"Cc\\\"]\\nGmail: Find Email: A wrapper around Zapier NLA actions. The input to this tool is a natural language instruction, for example \\\"get the latest email from my bank\\\" or \\\"send a slack message to the #general channel\\\". Each tool will have params associated with it that are specified as a list. You MUST take into account the params when creating the instruction. For example, if the params are ['Message_Text', 'Channel'], your instruction should be something like 'send a slack message to the #general channel with the text hello world'. Another example: if the params are ['Calendar', 'Search_Term'], your instruction should be something like 'find the meeting in my personal calendar at 3pm'. Do not make up params, they will be explicitly specified in the tool description. If you do not have enough information to fill in the params, just say 'not enough information provided in the instruction, missing <param>'. If you get a none or null response, STOP EXECUTION, do not try to another tool! This tool specifically used for: Gmail: Find Email, and has params: [\\\"Search_String\\\"]\\n\\nUse the following format in your response:\\n\\nQuestion: the input question you must answer\\nThought: you should always think about what to do\\nAction: the action to take, should be one of [Gmail: Send Email,Gmail: Find Email]\\nAction Input: the input to the action\\nObservation: the result of the action\\n... (this Thought/Action/Action Input/Observation can repeat N times)\\nThought: I now know the final answer\\nFinal Answer: the final answer to the original input question\\n\\nBegin!\\n\\nQuestion: 请用总结最后一封\\\"jsw@peterc.org\\\"发给我的邮件。并将总结翻译成中文后发送给\\\"zhanghaili@gmail.com\\\"\\nThought:\"",
+                                "  ]",
+                                "}",
+                                "\u001b[32m[tool/start]\u001b[39m [\u001b[90m1:chain:agent_executor > \u001b[1m4:tool:Gmail: Find Email\u001b[22m\u001b[39m] Entering Tool run with input: \"Find the latest email from jsw@peterc.org\"",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:agent_executor > 5:chain:llm_chain > \u001b[1m6:llm:openai\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"Answer the following questions as best you can. You have access to the following tools:\\n\\nGmail: Send Email: A wrapper around Zapier NLA actions. The input to this tool is a natural language instruction, for example \\\"get the latest email from my bank\\\" or \\\"send a slack message to the #general channel\\\". Each tool will have params associated with it that are specified as a list. You MUST take into account the params when creating the instruction. For example, if the params are ['Message_Text', 'Channel'], your instruction should be something like 'send a slack message to the #general channel with the text hello world'. Another example: if the params are ['Calendar', 'Search_Term'], your instruction should be something like 'find the meeting in my personal calendar at 3pm'. Do not make up params, they will be explicitly specified in the tool description. If you do not have enough information to fill in the params, just say 'not enough information provided in the instruction, missing <param>'. If you get a none or null response, STOP EXECUTION, do not try to another tool! This tool specifically used for: Gmail: Send Email, and has params: [\\\"To\\\",\\\"Body\\\",\\\"Subject\\\",\\\"Cc\\\"]\\nGmail: Find Email: A wrapper around Zapier NLA actions. The input to this tool is a natural language instruction, for example \\\"get the latest email from my bank\\\" or \\\"send a slack message to the #general channel\\\". Each tool will have params associated with it that are specified as a list. You MUST take into account the params when creating the instruction. For example, if the params are ['Message_Text', 'Channel'], your instruction should be something like 'send a slack message to the #general channel with the text hello world'. Another example: if the params are ['Calendar', 'Search_Term'], your instruction should be something like 'find the meeting in my personal calendar at 3pm'. Do not make up params, they will be explicitly specified in the tool description. If you do not have enough information to fill in the params, just say 'not enough information provided in the instruction, missing <param>'. If you get a none or null response, STOP EXECUTION, do not try to another tool! This tool specifically used for: Gmail: Find Email, and has params: [\\\"Search_String\\\"]\\n\\nUse the following format in your response:\\n\\nQuestion: the input question you must answer\\nThought: you should always think about what to do\\nAction: the action to take, should be one of [Gmail: Send Email,Gmail: Find Email]\\nAction Input: the input to the action\\nObservation: the result of the action\\n... (this Thought/Action/Action Input/Observation can repeat N times)\\nThought: I now know the final answer\\nFinal Answer: the final answer to the original input question\\n\\nBegin!\\n\\nQuestion: 请用总结最后一封\\\"jsw@peterc.org\\\"发给我的邮件。并将总结翻译成中文后发送给\\\"zhanghaili@gmail.com\\\"\\nThought: I need to find the latest email from jsw@peterc.org and then summarize it and translate it into Chinese before sending it to zhanghaili@gmail.com\\nAction: Gmail: Find Email\\nAction Input: Find the latest email from jsw@peterc.org\\nObservation: {\\\"from__email\\\":\\\"jsw@peterc.org\\\",\\\"from__name\\\":\\\"JavaScript Weekly\\\",\\\"date\\\":\\\"Thu, 11 May 2023 16:42:47 +0000 (UTC)\\\",\\\"to__emails\\\":\\\"zhanghaili@gmail.com\\\",\\\"message_url\\\":\\\"https://mail.google.com/mail/u/0/#inbox/1880bb1954db6fcf\\\",\\\"attachment_count\\\":\\\"0\\\",\\\"message_id\\\":\\\"1880bb1954db6fcf\\\",\\\"body_plain\\\":\\\"Should MS write Windows 12 in Svelte? It's possible, but it's too early to tell. The JavaScript ecosystem is delightfully weird and the new features coming in ECMAScript 2023 could make it a viable option. Full stack for front-end engineers with Jem Young (Netflix) is a great way to learn more.\\\"}\\nThought:\"",
+                                "  ]",
+                                "}",
+                                "\u001b[36m[llm/end]\u001b[39m [\u001b[90m1:chain:agent_executor > 5:chain:llm_chain > \u001b[1m6:llm:openai\u001b[22m\u001b[39m] [20.78s] Exiting LLM run with output: {",
+                                "  \"generations\": [",
+                                "    [",
+                                "      {",
+                                "        \"text\": \" I now need to summarize the email and translate it into Chinese\\nAction: Gmail: Send Email\\nAction Input: Send an email to zhanghaili@gmail.com with the subject \\\"Summary of Latest Email from jsw@peterc.org\\\" and the body \\\"MS 可能会用 Svelte 写 Windows 12，但现在还为时尚早。JavaScript 生态系统非常有趣，ECMAScript 2023 中的新特性可能会使其成为一个可行的选择。Netflix 的 Jem Young 提供的全栈前端工程师培训是一个很好的学习机会。\\\"\",",
+                                "        \"generationInfo\": {",
+                                "          \"finishReason\": \"stop\",",
+                                "          \"logprobs\": null",
+                                "        }",
+                                "      }",
+                                "    ]",
+                                "  ],",
+                                "  \"llmOutput\": {",
+                                "    \"tokenUsage\": {",
+                                "      \"completionTokens\": 217,",
+                                "      \"promptTokens\": 952,",
+                                "      \"totalTokens\": 1169",
+                                "    }",
+                                "  }",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m1:chain:agent_executor > \u001b[1m5:chain:llm_chain\u001b[22m\u001b[39m] [20.78s] Exiting Chain run with output: {",
+                                "  \"text\": \" I now need to summarize the email and translate it into Chinese\\nAction: Gmail: Send Email\\nAction Input: Send an email to zhanghaili@gmail.com with the subject \\\"Summary of Latest Email from jsw@peterc.org\\\" and the body \\\"MS 可能会用 Svelte 写 Windows 12，但现在还为时尚早。JavaScript 生态系统非常有趣，ECMAScript 2023 中的新特性可能会使其成为一个可行的选择。Netflix 的 Jem Young 提供的全栈前端工程师培训是一个很好的学习机会。\\\"\"",
+                                "}",
+                                "\u001b[34m[agent/action]\u001b[39m [\u001b[90m\u001b[1m1:chain:agent_executor\u001b[22m\u001b[39m] Agent selected action: {",
+                                "  \"tool\": \"Gmail: Send Email\",",
+                                "  \"toolInput\": \"Send an email to zhanghaili@gmail.com with the subject \\\"Summary of Latest Email from jsw@peterc.org\\\" and the body \\\"MS 可能会用 Svelte 写 Windows 12，但现在还为时尚早。JavaScript 生态系统非常有趣，ECMAScript 2023 中的新特性可能会使其成为一个可行的选择。Netflix 的 Jem Young 提供的全栈前端工程师培训是一个很好的学习机会。\",",
+                                "  \"log\": \" I now need to summarize the email and translate it into Chinese\\nAction: Gmail: Send Email\\nAction Input: Send an email to zhanghaili@gmail.com with the subject \\\"Summary of Latest Email from jsw@peterc.org\\\" and the body \\\"MS 可能会用 Svelte 写 Windows 12，但现在还为时尚早。JavaScript 生态系统非常有趣，ECMAScript 2023 中的新特性可能会使其成为一个可行的选择。Netflix 的 Jem Young 提供的全栈前端工程师培训是一个很好的学习机会。\\\"\"",
+                                "}",
+                                "\u001b[32m[tool/start]\u001b[39m [\u001b[90m1:chain:agent_executor > \u001b[1m7:tool:Gmail: Send Email\u001b[22m\u001b[39m] Entering Tool run with input: \"Send an email to zhanghaili@gmail.com with the subject \"Summary of Latest Email from jsw@peterc.org\" and the body \"MS 可能会用 Svelte 写 Windows 12，但现在还为时尚早。JavaScript 生态系统非常有趣，ECMAScript 2023 中的新特性可能会使其成为一个可行的选择。Netflix 的 Jem Young 提供的全栈前端工程师培训是一个很好的学习机会。\"",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:agent_executor > 8:chain:llm_chain > \u001b[1m9:llm:openai\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"Answer the following questions as best you can. You have access to the following tools:\\n\\nGmail: Send Email: A wrapper around Zapier NLA actions. The input to this tool is a natural language instruction, for example \\\"get the latest email from my bank\\\" or \\\"send a slack message to the #general channel\\\". Each tool will have params associated with it that are specified as a list. You MUST take into account the params when creating the instruction. For example, if the params are ['Message_Text', 'Channel'], your instruction should be something like 'send a slack message to the #general channel with the text hello world'. Another example: if the params are ['Calendar', 'Search_Term'], your instruction should be something like 'find the meeting in my personal calendar at 3pm'. Do not make up params, they will be explicitly specified in the tool description. If you do not have enough information to fill in the params, just say 'not enough information provided in the instruction, missing <param>'. If you get a none or null response, STOP EXECUTION, do not try to another tool! This tool specifically used for: Gmail: Send Email, and has params: [\\\"To\\\",\\\"Body\\\",\\\"Subject\\\",\\\"Cc\\\"]\\nGmail: Find Email: A wrapper around Zapier NLA actions. The input to this tool is a natural language instruction, for example \\\"get the latest email from my bank\\\" or \\\"send a slack message to the #general channel\\\". Each tool will have params associated with it that are specified as a list. You MUST take into account the params when creating the instruction. For example, if the params are ['Message_Text', 'Channel'], your instruction should be something like 'send a slack message to the #general channel with the text hello world'. Another example: if the params are ['Calendar', 'Search_Term'], your instruction should be something like 'find the meeting in my personal calendar at 3pm'. Do not make up params, they will be explicitly specified in the tool description. If you do not have enough information to fill in the params, just say 'not enough information provided in the instruction, missing <param>'. If you get a none or null response, STOP EXECUTION, do not try to another tool! This tool specifically used for: Gmail: Find Email, and has params: [\\\"Search_String\\\"]\\n\\nUse the following format in your response:\\n\\nQuestion: the input question you must answer\\nThought: you should always think about what to do\\nAction: the action to take, should be one of [Gmail: Send Email,Gmail: Find Email]\\nAction Input: the input to the action\\nObservation: the result of the action\\n... (this Thought/Action/Action Input/Observation can repeat N times)\\nThought: I now know the final answer\\nFinal Answer: the final answer to the original input question\\n\\nBegin!\\n\\nQuestion: 请用总结最后一封\\\"jsw@peterc.org\\\"发给我的邮件。并将总结翻译成中文后发送给\\\"zhanghaili@gmail.com\\\"\\nThought: I need to find the latest email from jsw@peterc.org and then summarize it and translate it into Chinese before sending it to zhanghaili@gmail.com\\nAction: Gmail: Find Email\\nAction Input: Find the latest email from jsw@peterc.org\\nObservation: {\\\"from__email\\\":\\\"jsw@peterc.org\\\",\\\"from__name\\\":\\\"JavaScript Weekly\\\",\\\"date\\\":\\\"Thu, 11 May 2023 16:42:47 +0000 (UTC)\\\",\\\"to__emails\\\":\\\"zhanghaili@gmail.com\\\",\\\"message_url\\\":\\\"https://mail.google.com/mail/u/0/#inbox/1880bb1954db6fcf\\\",\\\"attachment_count\\\":\\\"0\\\",\\\"message_id\\\":\\\"1880bb1954db6fcf\\\",\\\"body_plain\\\":\\\"Should MS write Windows 12 in Svelte? It's possible, but it's too early to tell. The JavaScript ecosystem is delightfully weird and the new features coming in ECMAScript 2023 could make it a viable option. Full stack for front-end engineers with Jem Young (Netflix) is a great way to learn more.\\\"}\\nThought: I now need to summarize the email and translate it into Chinese\\nAction: Gmail: Send Email\\nAction Input: Send an email to zhanghaili@gmail.com with the subject \\\"Summary of Latest Email from jsw@peterc.org\\\" and the body \\\"MS 可能会用 Svelte 写 Windows 12，但现在还为时尚早。JavaScript 生态系统非常有趣，ECMAScript 2023 中的新特性可能会使其成为一个可行的选择。Netflix 的 Jem Young 提供的全栈前端工程师培训是一个很好的学习机会。\\\"\\nObservation: {\\\"threadId\\\":\\\"1881544c0d1cb975\\\",\\\"labelIds\\\":\\\"UNREAD, SENT, INBOX\\\"}\\nThought:\"",
+                                "  ]",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m1:chain:agent_executor > \u001b[1m8:chain:llm_chain\u001b[22m\u001b[39m] [18.84s] Exiting Chain run with output: {",
+                                "  \"text\": \" I now know the final answer\\nFinal Answer: An email has been sent to zhanghaili@gmail.com with the subject \\\"Summary of Latest Email from jsw@peterc.org\\\" and the body \\\"MS 可能会用 Svelte 写 Windows 12，但现在还为时尚早。JavaScript 生态系统非常有趣，ECMAScript 2023 中的新特性可能会使其成为一个可行的选择。Netflix 的 Jem Young 提供的全栈前端工程师培训是一个很好的学习机会。\\\"\"",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m\u001b[1m1:chain:agent_executor\u001b[22m\u001b[39m] [69.99s] Exiting Chain run with output: {",
+                                "  \"output\": \"An email has been sent to zhanghaili@gmail.com with the subject \\\"Summary of Latest Email from jsw@peterc.org\\\" and the body \\\"MS 可能会用 Svelte 写 Windows 12，但现在还为时尚早。JavaScript 生态系统非常有趣，ECMAScript 2023 中的新特性可能会使其成为一个可行的选择。Netflix 的 Jem Young 提供的全栈前端工程师培训是一个很好的学习机会。\\\"\"",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "text/plain",
+                            "value": [
+                                "{",
+                                "  output: \u001b[32m'An email has been sent to zhanghaili@gmail.com with the subject \"Summary of Latest Email from jsw@peterc.org\" and the body \"MS 可能会用 Svelte 写 Windows 12，但现在还为时尚早。JavaScript 生态系统非常有趣，ECMAScript 2023 中的新特性可能会使其成为一个可行的选择。Netflix 的 Jem Young 提供的全栈前端工程师培训是一个很好的学习机会。\"'\u001b[39m",
+                                "}"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "// 使用顺序的任务链\nimport { SimpleSequentialChain, LLMChain } from 'langchain/chains';\nimport { OpenAI } from 'langchain/llms/openai';\nimport { PromptTemplate } from 'langchain/prompts';\n\n// This is an LLMChain to write a synopsis given a title of a play.\nconst llm = new OpenAI({ temperature: 0 });\nconst template = `You are a playwright. Given the title of play, it is your job to write a synopsis for that title.\n\n  Title: {title}\n  Playwright: This is a synopsis for the above play:`;\nconst promptTemplate = new PromptTemplate({\n  template,\n  inputVariables: ['title'],\n});\nconst synopsisChain = new LLMChain({ llm, prompt: promptTemplate });\n\n// This is an LLMChain to write a review of a play given a synopsis.\nconst reviewLLM = new OpenAI({ temperature: 0 });\nconst reviewTemplate = `You are a play critic from the New York Times. Given the synopsis of play, it is your job to write a review for that play.\n  \n  Play Synopsis:\n  {synopsis}\n  Review from a New York Times play critic of the above play:`;\nconst reviewPromptTemplate = new PromptTemplate({\n  template: reviewTemplate,\n  inputVariables: ['synopsis'],\n});\nconst reviewChain = new LLMChain({\n  llm: reviewLLM,\n  prompt: reviewPromptTemplate,\n});\n\nconst overallChain = new SimpleSequentialChain({\n  chains: [synopsisChain, reviewChain],\n  verbose: true,\n});\nawait overallChain.run('Tragedy at sunset on the beach');"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "\u001b[32m[chain/start]\u001b[39m [\u001b[90m\u001b[1m1:chain:simple_sequential_chain\u001b[22m\u001b[39m] Entering Chain run with input: {",
+                                "  \"input\": \"Tragedy at sunset on the beach\"",
+                                "}",
+                                "\u001b[32m[chain/start]\u001b[39m [\u001b[90m1:chain:simple_sequential_chain > \u001b[1m2:chain:llm_chain\u001b[22m\u001b[39m] Entering Chain run with input: {",
+                                "  \"title\": \"Tragedy at sunset on the beach\"",
+                                "}",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:simple_sequential_chain > 2:chain:llm_chain > \u001b[1m3:llm:openai\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"You are a playwright. Given the title of play, it is your job to write a synopsis for that title.\\n\\n  Title: Tragedy at sunset on the beach\\n  Playwright: This is a synopsis for the above play:\"",
+                                "  ]",
+                                "}",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:simple_sequential_chain > 4:chain:llm_chain > \u001b[1m5:llm:openai\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"You are a play critic from the New York Times. Given the synopsis of play, it is your job to write a review for that play.\\n  \\n  Play Synopsis:\\n  \\n\\nTragedy at Sunset on the Beach is a story of love, loss, and redemption. It follows the story of two young lovers, Jack and Jill, who meet on a beach at sunset. They quickly fall in love and plan to marry, but their plans are shattered when Jack is tragically killed in a car accident. \\n\\nJill is left devastated and struggles to cope with her grief. She finds solace in the company of her best friend, Sarah, who helps her to come to terms with her loss. As Jill begins to heal, she discovers that Jack had left her a letter before his death, which reveals a secret that changes everything. \\n\\nJill must now make a difficult decision: to accept the truth and move on with her life, or to remain in the past and never find closure. In the end, Jill finds the strength to forgive and move forward, and discovers that love can still be found in the most unexpected places.\\n  Review from a New York Times play critic of the above play:\"",
+                                "  ]",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m1:chain:simple_sequential_chain > \u001b[1m4:chain:llm_chain\u001b[22m\u001b[39m] [12.64s] Exiting Chain run with output: {",
+                                "  \"text\": \"\\n\\nTragedy at Sunset on the Beach is a powerful and moving story of love, loss, and redemption. The play follows the story of two young lovers, Jack and Jill, whose plans for a future together are tragically cut short when Jack is killed in a car accident. The audience is taken on an emotional journey as Jill struggles to cope with her grief and eventually finds the strength to forgive and move forward.\\n\\nThe performances of the two leads, Jack and Jill, are particularly noteworthy. They bring a depth of emotion to their characters that is both heartbreaking and inspiring. The supporting cast also does an excellent job of conveying the complexity of the characters’ relationships and the difficult decisions they must make.\\n\\nOverall, Tragedy at Sunset on the Beach is a touching and thought-provoking play that will leave audiences moved and inspired. It is a must-see for anyone looking for a powerful and meaningful theatrical experience.\"",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m\u001b[1m1:chain:simple_sequential_chain\u001b[22m\u001b[39m] [26.82s] Exiting Chain run with output: {",
+                                "  \"output\": \"\\n\\nTragedy at Sunset on the Beach is a powerful and moving story of love, loss, and redemption. The play follows the story of two young lovers, Jack and Jill, whose plans for a future together are tragically cut short when Jack is killed in a car accident. The audience is taken on an emotional journey as Jill struggles to cope with her grief and eventually finds the strength to forgive and move forward.\\n\\nThe performances of the two leads, Jack and Jill, are particularly noteworthy. They bring a depth of emotion to their characters that is both heartbreaking and inspiring. The supporting cast also does an excellent job of conveying the complexity of the characters’ relationships and the difficult decisions they must make.\\n\\nOverall, Tragedy at Sunset on the Beach is a touching and thought-provoking play that will leave audiences moved and inspired. It is a must-see for anyone looking for a powerful and meaningful theatrical experience.\"",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "text/plain",
+                            "value": [
+                                "\u001b[32m'\\n'\u001b[39m +",
+                                "  \u001b[32m'\\n'\u001b[39m +",
+                                "  \u001b[32m'Tragedy at Sunset on the Beach is a powerful and moving story of love, loss, and redemption. The play follows the story of two young lovers, Jack and Jill, whose plans for a future together are tragically cut short when Jack is killed in a car accident. The audience is taken on an emotional journey as Jill struggles to cope with her grief and eventually finds the strength to forgive and move forward.\\n'\u001b[39m +",
+                                "  \u001b[32m'\\n'\u001b[39m +",
+                                "  \u001b[32m'The performances of the two leads, Jack and Jill, are particularly noteworthy. They bring a depth of emotion to their characters that is both heartbreaking and inspiring. The supporting cast also does an excellent job of conveying the complexity of the characters’ relationships and the difficult decisions they must make.\\n'\u001b[39m +",
+                                "  \u001b[32m'\\n'\u001b[39m +",
+                                "  \u001b[32m'Overall, Tragedy at Sunset on the Beach is a touching and thought-provoking play that will leave audiences moved and inspired. It is a must-see for anyone looking for a powerful and meaningful theatrical experience.'\u001b[39m"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "// 使用格式化输出输出\nimport { OpenAI } from \"langchain/llms/openai\";\nimport { PromptTemplate } from \"langchain/prompts\";\nimport { StructuredOutputParser } from \"langchain/output_parsers\";\n\n// With a `StructuredOutputParser` we can define a schema for the output.\nconst parser = StructuredOutputParser.fromNamesAndDescriptions({\n  answer: \"answer to the user's question\",\n  source: \"source used to answer the user's question, should be a website.\",\n});\n\nconst formatInstructions = parser.getFormatInstructions();\n\nconst prompt = new PromptTemplate({\n  template:\n    \"Answer the users question as best as possible.\\n{format_instructions}\\n{question}\",\n  inputVariables: [\"question\"],\n  partialVariables: { format_instructions: formatInstructions },\n});\n\nconst model = new OpenAI({ temperature: 0 });\n\nconst input = await prompt.format({\n  question: \"What is the capital of France?\",\n});\nconst response = await model.call(input);\nconsole.log('[ response ] >', response)\n\n\nconst output = await parser.parse(response);\nconsole.log('[ output ] >', output);"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "[ response ] > ",
+                                "",
+                                "{\"answer\": \"Paris\", \"source\": \"https://en.wikipedia.org/wiki/Paris\"}",
+                                "[ output ] > { answer: 'Paris', source: 'https://en.wikipedia.org/wiki/Paris' }",
+                                ""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "// 使用 Memory 实现一个带记忆的对话机器人\nimport { OpenAI } from 'langchain/llms/openai';\nimport { ConversationSummaryMemory } from 'langchain/memory';\nimport { LLMChain } from 'langchain/chains';\nimport { PromptTemplate } from 'langchain/prompts';\n\nconst memory = new ConversationSummaryMemory({\n  memoryKey: 'chat_history',\n  llm: new OpenAI({ modelName: 'gpt-3.5-turbo', temperature: 0 }),\n});\n\nconst model = new OpenAI({ temperature: 0.9 });\nconst prompt = PromptTemplate.fromTemplate(`The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know.\n\nCurrent conversation:\n{chat_history}\nHuman: {input}\nAI:`);\nconst chain = new LLMChain({ llm: model, prompt, memory });\n\nconst res1 = await chain.call({ input: \"Hi! I'm Jim.\" });\nconsole.log({ res1, memory: await memory.loadMemoryVariables({}) });\n\nconst res2 = await chain.call({ input: \"What's my name?\" });\nconsole.log({ res2, memory: await memory.loadMemoryVariables({}) });"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "{",
+                                "  res1: {",
+                                "    text: \" Hi Jim! I'm AI. It's nice to meet you. Can I ask you a question?\"",
+                                "  },",
+                                "  memory: {",
+                                "    chat_history: 'The human introduces himself as Jim and the AI greets him and asks if it can ask a question.'",
+                                "  }",
+                                "}",
+                                "{",
+                                "  res2: {",
+                                "    text: ' Hi Jim! You just told me that your name is Jim, so I already know your name. Is there anything else I can help you with?'",
+                                "  },",
+                                "  memory: {",
+                                "    chat_history: 'Jim introduces himself to the AI and the AI greets him and asks if it can ask a question. Jim asks what his name is and the AI responds by saying that Jim just told it his name. The AI then asks if there is anything else it can help Jim with.'",
+                                "  }",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
