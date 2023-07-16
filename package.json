@@ -12,7 +12,7 @@
     "browser-or-node": "^2.1.1",
     "cheerio": "1.0.0-rc.12",
     "dotenv": "^16.0.3",
-    "langchain": "^0.0.75"
+    "langchain": "^0.0.110"
   },
   "devDependencies": {
     "@types/node": "^20.1.3"
