@@ -736,6 +736,94 @@
                     ]
                 }
             ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "import { PineconeClient } from \"@pinecone-database/pinecone\";\nimport * as dotenv from \"dotenv\";\nimport { Document } from \"langchain/document\";\nimport { OpenAIEmbeddings } from \"langchain/embeddings/openai\";\nimport { PineconeStore } from \"langchain/vectorstores/pinecone\";\n\ndotenv.config();\n\nconst client = new PineconeClient();\nawait client.init({\n  apiKey: process.env.PINECONE_API_KEY,\n  environment: process.env.PINECONE_ENVIRONMENT,\n});\nconst pineconeIndex = client.Index('langchain-valtown');\n\nconst docs = [\n  new Document({\n    metadata: { foo: \"bar\" },\n    pageContent: \"pinecone is a vector db\",\n  }),\n  new Document({\n    metadata: { foo: \"bar\" },\n    pageContent: \"the quick brown fox jumped over the lazy dog\",\n  }),\n  new Document({\n    metadata: { baz: \"qux\" },\n    pageContent: \"lorem ipsum dolor sit amet\",\n  }),\n  new Document({\n    metadata: { baz: \"qux\" },\n    pageContent: \"pinecones are the woody fruiting body and of a pine tree\",\n  }),\n];\n\nawait PineconeStore.fromDocuments(docs, new OpenAIEmbeddings(), {\n  pineconeIndex,\n});"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "(node:77335) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.",
+                                "(Use `node --trace-warnings ...` to show where the warning was created)",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "text/plain",
+                            "value": [
+                                "PineconeStore {",
+                                "  embeddings: OpenAIEmbeddings {",
+                                "    caller: AsyncCaller {",
+                                "      maxConcurrency: \u001b[33mInfinity\u001b[39m,",
+                                "      maxRetries: \u001b[33m6\u001b[39m,",
+                                "      queue: \u001b[36m[PQueue]\u001b[39m",
+                                "    },",
+                                "    modelName: \u001b[32m'text-embedding-ada-002'\u001b[39m,",
+                                "    batchSize: \u001b[33m512\u001b[39m,",
+                                "    stripNewLines: \u001b[33mtrue\u001b[39m,",
+                                "    timeout: \u001b[90mundefined\u001b[39m,",
+                                "    azureOpenAIApiVersion: \u001b[90mundefined\u001b[39m,",
+                                "    azureOpenAIApiKey: \u001b[90mundefined\u001b[39m,",
+                                "    azureOpenAIApiInstanceName: \u001b[90mundefined\u001b[39m,",
+                                "    azureOpenAIApiDeploymentName: \u001b[90mundefined\u001b[39m,",
+                                "    azureOpenAIBasePath: \u001b[90mundefined\u001b[39m,",
+                                "    client: OpenAIApi {",
+                                "      basePath: \u001b[32m'https://api.openai.com/v1'\u001b[39m,",
+                                "      axios: \u001b[36m[Function]\u001b[39m,",
+                                "      configuration: \u001b[36m[Configuration]\u001b[39m",
+                                "    },",
+                                "    clientConfig: {",
+                                "      apiKey: \u001b[32m'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'\u001b[39m",
+                                "    }",
+                                "  },",
+                                "  textKey: \u001b[32m'text'\u001b[39m,",
+                                "  namespace: \u001b[90mundefined\u001b[39m,",
+                                "  pineconeIndex: VectorOperationsApi {",
+                                "    configuration: Configuration {",
+                                "      configuration: \u001b[36m[Object]\u001b[39m",
+                                "    },",
+                                "    fetchApi: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    middleware: [],",
+                                "    _deleteRaw: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    _delete: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    delete1Raw: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    delete1: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    describeIndexStatsRaw: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    describeIndexStats: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    describeIndexStats1Raw: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    describeIndexStats1: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    fetchRaw: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    fetch: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    queryRaw: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    query: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    updateRaw: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    update: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    upsertRaw: \u001b[36m[Function (anonymous)]\u001b[39m,",
+                                "    upsert: \u001b[36m[Function (anonymous)]\u001b[39m",
+                                "  },",
+                                "  filter: \u001b[90mundefined\u001b[39m",
+                                "}"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "markdown",
+            "source": [
+                ""
+            ],
+            "outputs": []
         }
     ]
 }
