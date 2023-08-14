@@ -819,11 +819,85 @@
             ]
         },
         {
-            "language": "markdown",
+            "language": "typescript",
             "source": [
-                ""
+                "import { Milvus } from \"langchain/vectorstores/milvus\";\nimport { OpenAIEmbeddings } from \"langchain/embeddings/openai\";\n\nimport 'dotenv/config';\n\n// text sample from Godel, Escher, Bach\nconst vectorStore = await Milvus.fromTexts(\n  [\n    \"Tortoise: Labyrinth? Labyrinth? Could it Are we in the notorious Little\\\n            Harmonic Labyrinth of the dreaded Majotaur?\",\n    \"Achilles: Yiikes! What is that?\",\n    \"Tortoise: They say-although I person never believed it myself-that an I\\\n            Majotaur has created a tiny labyrinth sits in a pit in the middle of\\\n            it, waiting innocent victims to get lost in its fears complexity.\\\n            Then, when they wander and dazed into the center, he laughs and\\\n            laughs at them-so hard, that he laughs them to death!\",\n    \"Achilles: Oh, no!\",\n    \"Tortoise: But it's only a myth. Courage, Achilles.\",\n  ],\n  [{ id: 2 }, { id: 1 }, { id: 3 }, { id: 4 }, { id: 5 }],\n  new OpenAIEmbeddings(),\n  {\n    collectionName: \"langchain_valtown\",\n    url: {\n      address: process.env.ZILIZ_URL,\n      token: process.env.ZILIZ_API_KEY,\n    },\n  }\n);\n\nawait vectorStore.similaritySearch(\"scared\", 2);"
             ],
-            "outputs": []
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "(node:25060) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.",
+                                "(Use `node --trace-warnings ...` to show where the warning was created)",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "text/plain",
+                            "value": [
+                                "[",
+                                "  Document {",
+                                "    pageContent: \u001b[32m'Achilles: Oh, no!'\u001b[39m,",
+                                "    metadata: {",
+                                "      id: \u001b[33m443476344924058300\u001b[39m",
+                                "    }",
+                                "  },",
+                                "  Document {",
+                                "    pageContent: \u001b[32m'Achilles: Yiikes! What is that?'\u001b[39m,",
+                                "    metadata: {",
+                                "      id: \u001b[33m443476344924058300\u001b[39m",
+                                "    }",
+                                "  }",
+                                "]"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "import { MilvusClient, ConsistencyLevelEnum } from \"@zilliz/milvus2-sdk-node\";\n\n// connecting\nconsole.info(`Connecting to DB: ${process.env.ZILIZ_URL}`);\nconst client = new MilvusClient({ \n  address: process.env.ZILIZ_URL!, \n  token: process.env.ZILIZ_API_KEY, \n});\nconsole.info(`Success!`);\n\n(async () => {\n  // dimension\n  const dimension = 64;\n  const collection_name = \"hello_milvus\";\n  const num_of_rows = 1000;\n  // create colleciton\n  console.time(`Creating example collection: ${collection_name}`);\n  await client.createCollection({\n    collection_name,\n    dimension,\n  });\n  console.timeEnd(`Creating example collection: ${collection_name}`);\n\n  const data = [];\n  Array(num_of_rows)\n    .fill(1)\n    .forEach(() => {\n      data.push({\n        id: Math.floor(Math.random() * 100000),\n        vector: [...Array(dimension)].map(() => Math.random()),\n      });\n    });\n  // inserting\n  console.time(`Inserting 1000 entities successfully`);\n  await client.insert({\n    collection_name,\n    data,\n  });\n  console.timeEnd(`Inserting 1000 entities successfully`);\n\n  // search\n  console.time(`Searching vector`);\n  const res = await client.search({\n    collection_name,\n    vector: data[0][\"vector\"],\n    output_fields: [\"id\"],\n    limit: 10,\n    consistency_level: ConsistencyLevelEnum.Bounded,\n  });\n  console.timeEnd(`Searching vector`);\n  console.log(res);\n})();\n"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "Connecting to DB: https://in03-02861d92d812d64.api.gcp-us-west1.zillizcloud.com",
+                                "Success!",
+                                "[2023-08-07T06:06:20.853Z] Milvus-sdk-node \u001b[32minfo\u001b[39m: Collection hello_milvus is already existed and indexed, index params ignored.",
+                                "Creating example collection: hello_milvus: 2.608s",
+                                "Inserting 1000 entities successfully: 1.145s",
+                                "{",
+                                "  status: { error_code: 'Success', reason: '' },",
+                                "  results: [",
+                                "    { score: 22.101722717285156, id: '51393' },",
+                                "    { score: 21.884334564208984, id: '12259' },",
+                                "    { score: 21.76031494140625, id: '80234' },",
+                                "    { score: 21.745832443237305, id: '38584' },",
+                                "    { score: 21.7136287689209, id: '7252' },",
+                                "    { score: 21.667694091796875, id: '73182' },",
+                                "    { score: 21.430213928222656, id: '88338' },",
+                                "    { score: 21.37177848815918, id: '52727' },",
+                                "    { score: 21.1215763092041, id: '7005' },",
+                                "    { score: 21.079395294189453, id: '74165' }",
+                                "  ]",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

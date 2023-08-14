@@ -7,12 +7,13 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@pinecone-database/pinecone": "^0.1.5",
+    "@pinecone-database/pinecone": "^0.1.6",
+    "@zilliz/milvus2-sdk-node": "^2.2.23",
     "axios": "^1.4.0",
     "browser-or-node": "^2.1.1",
     "cheerio": "1.0.0-rc.12",
-    "dotenv": "^16.0.3",
-    "langchain": "^0.0.110"
+    "dotenv": "^16.3.1",
+    "langchain": "^0.0.123"
   },
   "devDependencies": {
     "@types/node": "^20.1.3"
