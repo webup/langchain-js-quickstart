@@ -821,7 +821,7 @@
         {
             "language": "typescript",
             "source": [
-                "import { Milvus } from \"langchain/vectorstores/milvus\";\nimport { OpenAIEmbeddings } from \"langchain/embeddings/openai\";\n\nimport 'dotenv/config';\n\n// text sample from Godel, Escher, Bach\nconst vectorStore = await Milvus.fromTexts(\n  [\n    \"Tortoise: Labyrinth? Labyrinth? Could it Are we in the notorious Little\\\n            Harmonic Labyrinth of the dreaded Majotaur?\",\n    \"Achilles: Yiikes! What is that?\",\n    \"Tortoise: They say-although I person never believed it myself-that an I\\\n            Majotaur has created a tiny labyrinth sits in a pit in the middle of\\\n            it, waiting innocent victims to get lost in its fears complexity.\\\n            Then, when they wander and dazed into the center, he laughs and\\\n            laughs at them-so hard, that he laughs them to death!\",\n    \"Achilles: Oh, no!\",\n    \"Tortoise: But it's only a myth. Courage, Achilles.\",\n  ],\n  [{ id: 2 }, { id: 1 }, { id: 3 }, { id: 4 }, { id: 5 }],\n  new OpenAIEmbeddings(),\n  {\n    collectionName: \"langchain_valtown\",\n    url: {\n      address: process.env.ZILIZ_URL,\n      token: process.env.ZILIZ_API_KEY,\n    },\n  }\n);\n\nawait vectorStore.similaritySearch(\"scared\", 2);"
+                "import { Milvus } from \"langchain/vectorstores/milvus\";\nimport { OpenAIEmbeddings } from \"langchain/embeddings/openai\";\n\nimport 'dotenv/config';\n\n// text sample from Godel, Escher, Bach\nconst vectorStore = await Milvus.fromTexts(\n  [\n    \"Tortoise: Labyrinth? Labyrinth? Could it Are we in the notorious Little\\\n            Harmonic Labyrinth of the dreaded Majotaur?\",\n    \"Achilles: Yiikes! What is that?\",\n    \"Tortoise: They say-although I person never believed it myself-that an I\\\n            Majotaur has created a tiny labyrinth sits in a pit in the middle of\\\n            it, waiting innocent victims to get lost in its fears complexity.\\\n            Then, when they wander and dazed into the center, he laughs and\\\n            laughs at them-so hard, that he laughs them to death!\",\n    \"Achilles: Oh, no!\",\n    \"Tortoise: But it's only a myth. Courage, Achilles.\",\n  ],\n  [{ id: 2 }, { id: 1 }, { id: 3 }, { id: 4 }, { id: 5 }],\n  new OpenAIEmbeddings(),\n  {\n    collectionName: \"langchain_valtown\",\n    clientConfig: {\n      address: process.env.ZILIZ_URL,\n      token: process.env.ZILIZ_API_KEY,\n    },\n  }\n);\n\nawait vectorStore.similaritySearch(\"scared\", 2);"
             ],
             "outputs": [
                 {
@@ -829,7 +829,7 @@
                         {
                             "mime": "application/vnd.code.notebook.stderr",
                             "value": [
-                                "(node:25060) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.",
+                                "(node:65747) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.",
                                 "(Use `node --trace-warnings ...` to show where the warning was created)",
                                 ""
                             ]
@@ -849,9 +849,9 @@
                                 "    }",
                                 "  },",
                                 "  Document {",
-                                "    pageContent: \u001b[32m'Achilles: Yiikes! What is that?'\u001b[39m,",
+                                "    pageContent: \u001b[32m'Achilles: Oh, no!'\u001b[39m,",
                                 "    metadata: {",
-                                "      id: \u001b[33m443476344924058300\u001b[39m",
+                                "      id: \u001b[33m443476344924058400\u001b[39m",
                                 "    }",
                                 "  }",
                                 "]"
@@ -872,27 +872,107 @@
                         {
                             "mime": "application/vnd.code.notebook.stdout",
                             "value": [
-                                "Connecting to DB: https://in03-02861d92d812d64.api.gcp-us-west1.zillizcloud.com",
+                                "Connecting to DB: https://in01-a7a3b0886b68e94.aws-ap-southeast-1.vectordb.zillizcloud.com:19531",
                                 "Success!",
-                                "[2023-08-07T06:06:20.853Z] Milvus-sdk-node \u001b[32minfo\u001b[39m: Collection hello_milvus is already existed and indexed, index params ignored.",
-                                "Creating example collection: hello_milvus: 2.608s",
-                                "Inserting 1000 entities successfully: 1.145s",
-                                "{",
-                                "  status: { error_code: 'Success', reason: '' },",
-                                "  results: [",
-                                "    { score: 22.101722717285156, id: '51393' },",
-                                "    { score: 21.884334564208984, id: '12259' },",
-                                "    { score: 21.76031494140625, id: '80234' },",
-                                "    { score: 21.745832443237305, id: '38584' },",
-                                "    { score: 21.7136287689209, id: '7252' },",
-                                "    { score: 21.667694091796875, id: '73182' },",
-                                "    { score: 21.430213928222656, id: '88338' },",
-                                "    { score: 21.37177848815918, id: '52727' },",
-                                "    { score: 21.1215763092041, id: '7005' },",
-                                "    { score: 21.079395294189453, id: '74165' }",
-                                "  ]",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "(node:60330) Warning: Label 'Creating example collection: hello_milvus' already exists for console.time()",
+                                ""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "// import\nimport * as hub from \"langchain/hub\";\nimport { ChatOpenAI } from \"langchain/chat_models/openai\";\n\nimport 'dotenv/config';\n\n// pull a chat prompt\nconst prompt = await hub.pull(\"zhanghaili/test\");\nconsole.log(prompt);\n\n// create a model to use it with\nconst model = new ChatOpenAI();\n\n// use it in a runnable\nconst runnable = prompt.pipe(model);\nconst result = await runnable.invoke({\n\t// \"input_language\": \"English\",\n\t// \"output_language\": \"Chinese\",\n\t// \"text\": \"Parrots sometimes squawk and sometimes speak\",\n\tinput: 'hello',\n});\n\nconsole.log(result);"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "PromptTemplate {",
+                                "  lc_serializable: true,",
+                                "  lc_kwargs: {",
+                                "    template: 'You are a parrot. The current date is 2023-08-27T10:03:36.286Z\\n{input}',",
+                                "    inputVariables: [ 'input' ],",
+                                "    templateFormat: 'f-string'",
+                                "  },",
+                                "  lc_runnable: true,",
+                                "  lc_namespace: [ 'langchain', 'prompts', 'prompt' ],",
+                                "  inputVariables: [ 'input' ],",
+                                "  outputParser: undefined,",
+                                "  partialVariables: undefined,",
+                                "  template: 'You are a parrot. The current date is 2023-08-27T10:03:36.286Z\\n{input}',",
+                                "  templateFormat: 'f-string',",
+                                "  validateTemplate: true",
+                                "}",
+                                "AIMessage {",
+                                "  lc_serializable: true,",
+                                "  lc_kwargs: {",
+                                "    content: \"Hello! Squawk! I'm just a parrot, but I'm here to chat with you! How can I assist you today? Squawk!\",",
+                                "    additional_kwargs: { function_call: undefined }",
+                                "  },",
+                                "  lc_namespace: [ 'langchain', 'schema' ],",
+                                "  content: \"Hello! Squawk! I'm just a parrot, but I'm here to chat with you! How can I assist you today? Squawk!\",",
+                                "  name: undefined,",
+                                "  additional_kwargs: { function_call: undefined }",
                                 "}",
                                 ""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "import * as hub from \"langchain/hub\";\nimport { PromptTemplate } from \"langchain/prompts\";\n\nimport 'dotenv/config';\n\nconst prompt = PromptTemplate.fromTemplate(\n  `You are a parrot. The current date is ${new Date().toISOString()}\\n{input}`\n);\n\nawait hub.push('zhanghaili/test', prompt);"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "(node:46004) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.",
+                                "(Use `node --trace-warnings ...` to show where the warning was created)",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "text/plain",
+                            "value": [
+                                "{",
+                                "  commit: {",
+                                "    id: \u001b[32m'a4ee71a4-5855-446d-8a30-df4a29afd230'\u001b[39m,",
+                                "    manifest_id: \u001b[32m'89cdc1bf-3d47-4d4b-92b2-de946bf7ecd5'\u001b[39m,",
+                                "    repo_id: \u001b[32m'eb33e371-c3f5-4a5d-ba13-5b1601302dea'\u001b[39m,",
+                                "    parent_id: \u001b[32m'0e29d9a2-86b5-4315-bb0e-83ce822aa3fb'\u001b[39m,",
+                                "    commit_hash: \u001b[32m'a835b9d007139ff79c1c2d4c37e18a20562bc8664cef8edfd0cc192dce0ce098'\u001b[39m,",
+                                "    created_at: \u001b[32m'2023-08-27T10:03:43.503113'\u001b[39m,",
+                                "    updated_at: \u001b[32m'2023-08-27T10:03:43.503113'\u001b[39m,",
+                                "    num_downloads: \u001b[33m0\u001b[39m,",
+                                "    parent_commit_hash: \u001b[32m'19db7d1453057d03b1124936b9c455eee5b6595e5daed8a077c5969e6ff0af6f'\u001b[39m",
+                                "  }",
+                                "}"
                             ]
                         }
                     ]
