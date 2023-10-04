@@ -27,9 +27,33 @@
                 {
                     "items": [
                         {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "(node:791) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.",
+                                "(Use `node --trace-warnings ...` to show where the warning was created)",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
                             "mime": "text/plain",
                             "value": [
-                                "\u001b[32m'作为一个AI模型，我不能有任何偏见或评价。但是，人工智能可以帮助我们在许多领域取得进步和改进，例如医疗保健、交通、教育等。它可以帮助我们更快、更准确地进行决策和分析，同时也可以减少人类工作的重复性和单调性。但是，我们也需要警惕人工智能可能带来的负面影响，例如失业、隐私问题和人类价值观的冲击等。因此，我们需要在使用人工智能的过程中保持谨慎和透明，同时不断探索如何最大化其潜力，同时最小化其负面影响。'\u001b[39m"
+                                "\u001b[32m'人工智能是一种能够模拟人类智能的技术，它可以通过学习、推理、感知和交流等方式来实现各种任务。以下是对人工智能的评价：\\n'\u001b[39m +",
+                                "  \u001b[32m'\\n'\u001b[39m +",
+                                "  \u001b[32m'1. 创新性：人工智能的出现为许多领域带来了全新的解决方案和创新思维。它可以处理大量的数据并从中提取有价值的信息，从而帮助人们做出更明智的决策。\\n'\u001b[39m +",
+                                "  \u001b[32m'\\n'\u001b[39m +",
+                                "  \u001b[32m'2. 高效性：人工智能可以在短时间内处理大量的信息，而且能够快速学习和适应新的环境。这使得它在许多领域中能够取代人力劳动，提高工作效率。\\n'\u001b[39m +",
+                                "  \u001b[32m'\\n'\u001b[39m +",
+                                "  \u001b[32m'3. 精确性：人工智能在执行任务时通常能够准确无误地完成，且不会受到情绪、疲劳或其他人类因素的影响。这使得它在某些需要高度精确性的领域中具有巨大的潜力，如医疗诊断、金融分析等。\\n'\u001b[39m +",
+                                "  \u001b[32m'\\n'\u001b[39m +",
+                                "  \u001b[32m'4. 自主性：一些人工智能系统具备自主学习和决策的能力，可以通过不断的反馈和调整来提高自身的性能。这使得它们能够在没有人类干预的情况下进行自主决策，并逐渐提高自身的智能水平。\\n'\u001b[39m +",
+                                "  \u001b[32m'\\n'\u001b[39m +",
+                                "  \u001b[32m'5. 潜在风险：尽管人工智能有许多优点，但也存在一些潜在的风险和挑战。例如，人工智能可能会取代人类的工作岗位，导致失业问题；同时，人工智能也可能因为缺乏道德判断力而产生不符合伦理标准的行为。\\n'\u001b[39m +",
+                                "  \u001b[32m'\\n'\u001b[39m +",
+                                "  \u001b[32m'综上所述，人工智能是一项具有巨大潜力和创新性的技术，它在许多领域中都能够发挥重要作用。然而，我们也需要审慎对待人工智能的发展，确保其在符合伦理和社会价值的前提下发挥正面影响。'\u001b[39m"
                             ]
                         }
                     ]
@@ -973,6 +997,518 @@
                                 "    parent_commit_hash: \u001b[32m'19db7d1453057d03b1124936b9c455eee5b6595e5daed8a077c5969e6ff0af6f'\u001b[39m",
                                 "  }",
                                 "}"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "import { z } from \"zod\";\nimport { ChatOpenAI } from \"langchain/chat_models/openai\";\nimport { initializeAgentExecutorWithOptions } from \"langchain/agents\";\nimport { Calculator } from \"langchain/tools/calculator\";\nimport { DynamicStructuredTool } from \"langchain/tools\";\n\nimport 'dotenv/config';\n\n\nconst model = new ChatOpenAI({ temperature: 0 });\nconst tools = [\n  new Calculator(), // Older existing single input tools will still work\n  new DynamicStructuredTool({\n    name: \"random-number-generator\",\n    description: \"generates a random number between two input numbers\",\n    schema: z.object({\n      low: z.number().describe(\"The lower bound of the generated number\"),\n      high: z.number().describe(\"The upper bound of the generated number\"),\n    }),\n    func: async ({ low, high }) =>\n      (Math.random() * (high - low) + low).toString(), // Outputs still must be strings\n    returnDirect: false, // This is an option that allows the tool to return the output directly\n  }),\n];\n\nconst executor = await initializeAgentExecutorWithOptions(tools, model, {\n  agentType: \"structured-chat-zero-shot-react-description\",\n  verbose: true,\n});\nconsole.log(\"Loaded agent.\");\n\nconst input = `What is a random number between 5 and 10 raised to the second power?`;\n\nconsole.log(`Executing with input \"${input}\"...`);\n\nconst result = await executor.call({ input });\n\nconsole.log({ result });\n"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "Loaded agent.",
+                                "Executing with input \"What is a random number between 5 and 10 raised to the second power?\"...",
+                                "\u001b[32m[chain/start]\u001b[39m [\u001b[90m\u001b[1m1:chain:AgentExecutor\u001b[22m\u001b[39m] Entering Chain run with input: {",
+                                "  \"input\": \"What is a random number between 5 and 10 raised to the second power?\"",
+                                "}",
+                                "\u001b[32m[chain/start]\u001b[39m [\u001b[90m1:chain:AgentExecutor > \u001b[1m2:chain:LLMChain\u001b[22m\u001b[39m] Entering Chain run with input: {",
+                                "  \"input\": \"What is a random number between 5 and 10 raised to the second power?\",",
+                                "  \"agent_scratchpad\": \"\",",
+                                "  \"stop\": [",
+                                "    \"Observation:\"",
+                                "  ]",
+                                "}",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:AgentExecutor > 2:chain:LLMChain > \u001b[1m3:llm:ChatOpenAI\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"messages\": [",
+                                "    [",
+                                "      {",
+                                "        \"lc\": 1,",
+                                "        \"type\": \"constructor\",",
+                                "        \"id\": [",
+                                "          \"langchain\",",
+                                "          \"schema\",",
+                                "          \"SystemMessage\"",
+                                "        ],",
+                                "        \"kwargs\": {",
+                                "          \"content\": \"Answer the following questions truthfully and as best you can.\\n\\nYou have access to the following tools.\\nYou must format your inputs to these tools to match their \\\"JSON schema\\\" definitions below.\\n\\n\\\"JSON Schema\\\" is a declarative language that allows you to annotate and validate JSON documents.\\n\\nFor example, the example \\\"JSON Schema\\\" instance {\\\"properties\\\": {\\\"foo\\\": {\\\"description\\\": \\\"a list of test words\\\", \\\"type\\\": \\\"array\\\", \\\"items\\\": {\\\"type\\\": \\\"string\\\"}}}, \\\"required\\\": [\\\"foo\\\"]}}\\nwould match an object with one required property, \\\"foo\\\". The \\\"type\\\" property specifies \\\"foo\\\" must be an \\\"array\\\", and the \\\"description\\\" property semantically describes it as \\\"a list of test words\\\". The items within \\\"foo\\\" must be strings.\\nThus, the object {\\\"foo\\\": [\\\"bar\\\", \\\"baz\\\"]} is a well-formatted instance of this example \\\"JSON Schema\\\". The object {\\\"properties\\\": {\\\"foo\\\": [\\\"bar\\\", \\\"baz\\\"]}} is not well-formatted.\\n\\nHere are the JSON Schema instances for the tools you have access to:\\n\\ncalculator: Useful for getting the result of a math expression. The input to this tool should be a valid mathematical expression that could be executed by a simple calculator., args: {\\\"input\\\":{\\\"type\\\":\\\"string\\\"}}\\nrandom-number-generator: generates a random number between two input numbers, args: {\\\"low\\\":{\\\"type\\\":\\\"number\\\",\\\"description\\\":\\\"The lower bound of the generated number\\\"},\\\"high\\\":{\\\"type\\\":\\\"number\\\",\\\"description\\\":\\\"The upper bound of the generated number\\\"}}\\n\\nThe way you use the tools is as follows:\\n\\n------------------------\\n\\nOutput a JSON markdown code snippet containing a valid JSON blob (denoted below by $JSON_BLOB).\\nThis $JSON_BLOB must have a \\\"action\\\" key (with the name of the tool to use) and an \\\"action_input\\\" key (tool input).\\n\\nValid \\\"action\\\" values: \\\"Final Answer\\\" (which you must use when giving your final response to the user), or one of [calculator, random-number-generator].\\n\\nThe $JSON_BLOB must be valid, parseable JSON and only contain a SINGLE action. Here is an example of an acceptable output:\\n\\n```json\\n{\\n  \\\"action\\\": $TOOL_NAME,\\n  \\\"action_input\\\": $INPUT\\n}\\n```\\n\\nRemember to include the surrounding markdown code snippet delimiters (begin with \\\"```\\\" json and close with \\\"```\\\")!\\n\\n\\nIf you are using a tool, \\\"action_input\\\" must adhere to the tool's input schema, given above.\\n\\n------------------------\\n\\nALWAYS use the following format:\\n\\nQuestion: the input question you must answer\\nThought: you should always think about what to do\\nAction:\\n```json\\n$JSON_BLOB\\n```\\nObservation: the result of the action\\n... (this Thought/Action/Observation can repeat N times)\\nThought: I now know the final answer\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"Final Answer\\\",\\n  \\\"action_input\\\": \\\"Final response to human\\\"\\n}\\n```\\n\\nBegin! Reminder to ALWAYS use the above format, and to use tools if appropriate.\",",
+                                "          \"additional_kwargs\": {}",
+                                "        }",
+                                "      },",
+                                "      {",
+                                "        \"lc\": 1,",
+                                "        \"type\": \"constructor\",",
+                                "        \"id\": [",
+                                "          \"langchain\",",
+                                "          \"schema\",",
+                                "          \"HumanMessage\"",
+                                "        ],",
+                                "        \"kwargs\": {",
+                                "          \"content\": \"What is a random number between 5 and 10 raised to the second power?\\n\\n\",",
+                                "          \"additional_kwargs\": {}",
+                                "        }",
+                                "      }",
+                                "    ]",
+                                "  ]",
+                                "}",
+                                "\u001b[36m[llm/end]\u001b[39m [\u001b[90m1:chain:AgentExecutor > 2:chain:LLMChain > \u001b[1m3:llm:ChatOpenAI\u001b[22m\u001b[39m] [4.05s] Exiting LLM run with output: {",
+                                "  \"generations\": [",
+                                "    [",
+                                "      {",
+                                "        \"text\": \"I can use the random-number-generator tool to generate a random number between 5 and 10. Then I can use the calculator tool to raise that number to the second power.\\n\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"random-number-generator\\\",\\n  \\\"action_input\\\": {\\n    \\\"low\\\": 5,\\n    \\\"high\\\": 10\\n  }\\n}\\n```\\n\\n\",",
+                                "        \"message\": {",
+                                "          \"lc\": 1,",
+                                "          \"type\": \"constructor\",",
+                                "          \"id\": [",
+                                "            \"langchain\",",
+                                "            \"schema\",",
+                                "            \"AIMessage\"",
+                                "          ],",
+                                "          \"kwargs\": {",
+                                "            \"content\": \"I can use the random-number-generator tool to generate a random number between 5 and 10. Then I can use the calculator tool to raise that number to the second power.\\n\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"random-number-generator\\\",\\n  \\\"action_input\\\": {\\n    \\\"low\\\": 5,\\n    \\\"high\\\": 10\\n  }\\n}\\n```\\n\\n\",",
+                                "            \"additional_kwargs\": {}",
+                                "          }",
+                                "        },",
+                                "        \"generationInfo\": {",
+                                "          \"finish_reason\": \"stop\"",
+                                "        }",
+                                "      }",
+                                "    ]",
+                                "  ],",
+                                "  \"llmOutput\": {",
+                                "    \"tokenUsage\": {",
+                                "      \"completionTokens\": 76,",
+                                "      \"promptTokens\": 657,",
+                                "      \"totalTokens\": 733",
+                                "    }",
+                                "  }",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m1:chain:AgentExecutor > \u001b[1m2:chain:LLMChain\u001b[22m\u001b[39m] [4.74s] Exiting Chain run with output: {",
+                                "  \"text\": \"I can use the random-number-generator tool to generate a random number between 5 and 10. Then I can use the calculator tool to raise that number to the second power.\\n\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"random-number-generator\\\",\\n  \\\"action_input\\\": {\\n    \\\"low\\\": 5,\\n    \\\"high\\\": 10\\n  }\\n}\\n```\\n\\n\"",
+                                "}",
+                                "\u001b[36m[tool/end]\u001b[39m [\u001b[90m1:chain:AgentExecutor > \u001b[1m4:tool:DynamicStructuredTool\u001b[22m\u001b[39m] [249ms] Exiting Tool run with output: \"5.10414753513435\"",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:AgentExecutor > 5:chain:LLMChain > \u001b[1m6:llm:ChatOpenAI\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"messages\": [",
+                                "    [",
+                                "      {",
+                                "        \"lc\": 1,",
+                                "        \"type\": \"constructor\",",
+                                "        \"id\": [",
+                                "          \"langchain\",",
+                                "          \"schema\",",
+                                "          \"SystemMessage\"",
+                                "        ],",
+                                "        \"kwargs\": {",
+                                "          \"content\": \"Answer the following questions truthfully and as best you can.\\n\\nYou have access to the following tools.\\nYou must format your inputs to these tools to match their \\\"JSON schema\\\" definitions below.\\n\\n\\\"JSON Schema\\\" is a declarative language that allows you to annotate and validate JSON documents.\\n\\nFor example, the example \\\"JSON Schema\\\" instance {\\\"properties\\\": {\\\"foo\\\": {\\\"description\\\": \\\"a list of test words\\\", \\\"type\\\": \\\"array\\\", \\\"items\\\": {\\\"type\\\": \\\"string\\\"}}}, \\\"required\\\": [\\\"foo\\\"]}}\\nwould match an object with one required property, \\\"foo\\\". The \\\"type\\\" property specifies \\\"foo\\\" must be an \\\"array\\\", and the \\\"description\\\" property semantically describes it as \\\"a list of test words\\\". The items within \\\"foo\\\" must be strings.\\nThus, the object {\\\"foo\\\": [\\\"bar\\\", \\\"baz\\\"]} is a well-formatted instance of this example \\\"JSON Schema\\\". The object {\\\"properties\\\": {\\\"foo\\\": [\\\"bar\\\", \\\"baz\\\"]}} is not well-formatted.\\n\\nHere are the JSON Schema instances for the tools you have access to:\\n\\ncalculator: Useful for getting the result of a math expression. The input to this tool should be a valid mathematical expression that could be executed by a simple calculator., args: {\\\"input\\\":{\\\"type\\\":\\\"string\\\"}}\\nrandom-number-generator: generates a random number between two input numbers, args: {\\\"low\\\":{\\\"type\\\":\\\"number\\\",\\\"description\\\":\\\"The lower bound of the generated number\\\"},\\\"high\\\":{\\\"type\\\":\\\"number\\\",\\\"description\\\":\\\"The upper bound of the generated number\\\"}}\\n\\nThe way you use the tools is as follows:\\n\\n------------------------\\n\\nOutput a JSON markdown code snippet containing a valid JSON blob (denoted below by $JSON_BLOB).\\nThis $JSON_BLOB must have a \\\"action\\\" key (with the name of the tool to use) and an \\\"action_input\\\" key (tool input).\\n\\nValid \\\"action\\\" values: \\\"Final Answer\\\" (which you must use when giving your final response to the user), or one of [calculator, random-number-generator].\\n\\nThe $JSON_BLOB must be valid, parseable JSON and only contain a SINGLE action. Here is an example of an acceptable output:\\n\\n```json\\n{\\n  \\\"action\\\": $TOOL_NAME,\\n  \\\"action_input\\\": $INPUT\\n}\\n```\\n\\nRemember to include the surrounding markdown code snippet delimiters (begin with \\\"```\\\" json and close with \\\"```\\\")!\\n\\n\\nIf you are using a tool, \\\"action_input\\\" must adhere to the tool's input schema, given above.\\n\\n------------------------\\n\\nALWAYS use the following format:\\n\\nQuestion: the input question you must answer\\nThought: you should always think about what to do\\nAction:\\n```json\\n$JSON_BLOB\\n```\\nObservation: the result of the action\\n... (this Thought/Action/Observation can repeat N times)\\nThought: I now know the final answer\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"Final Answer\\\",\\n  \\\"action_input\\\": \\\"Final response to human\\\"\\n}\\n```\\n\\nBegin! Reminder to ALWAYS use the above format, and to use tools if appropriate.\",",
+                                "          \"additional_kwargs\": {}",
+                                "        }",
+                                "      },",
+                                "      {",
+                                "        \"lc\": 1,",
+                                "        \"type\": \"constructor\",",
+                                "        \"id\": [",
+                                "          \"langchain\",",
+                                "          \"schema\",",
+                                "          \"HumanMessage\"",
+                                "        ],",
+                                "        \"kwargs\": {",
+                                "          \"content\": \"What is a random number between 5 and 10 raised to the second power?\\n\\nThis was your previous work (but I haven't seen any of it! I only see what you return as final answer):\\nI can use the random-number-generator tool to generate a random number between 5 and 10. Then I can use the calculator tool to raise that number to the second power.\\n\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"random-number-generator\\\",\\n  \\\"action_input\\\": {\\n    \\\"low\\\": 5,\\n    \\\"high\\\": 10\\n  }\\n}\\n```\\n\\n\\nObservation: 5.10414753513435\\nThought:\",",
+                                "          \"additional_kwargs\": {}",
+                                "        }",
+                                "      }",
+                                "    ]",
+                                "  ]",
+                                "}",
+                                "\u001b[36m[llm/end]\u001b[39m [\u001b[90m1:chain:AgentExecutor > 5:chain:LLMChain > \u001b[1m6:llm:ChatOpenAI\u001b[22m\u001b[39m] [3.64s] Exiting LLM run with output: {",
+                                "  \"generations\": [",
+                                "    [",
+                                "      {",
+                                "        \"text\": \"Now I have a random number between 5 and 10. I can use the calculator tool to raise that number to the second power.\\n\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"calculator\\\",\\n  \\\"action_input\\\": \\\"5.10414753513435^2\\\"\\n}\\n```\",",
+                                "        \"message\": {",
+                                "          \"lc\": 1,",
+                                "          \"type\": \"constructor\",",
+                                "          \"id\": [",
+                                "            \"langchain\",",
+                                "            \"schema\",",
+                                "            \"AIMessage\"",
+                                "          ],",
+                                "          \"kwargs\": {",
+                                "            \"content\": \"Now I have a random number between 5 and 10. I can use the calculator tool to raise that number to the second power.\\n\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"calculator\\\",\\n  \\\"action_input\\\": \\\"5.10414753513435^2\\\"\\n}\\n```\",",
+                                "            \"additional_kwargs\": {}",
+                                "          }",
+                                "        },",
+                                "        \"generationInfo\": {",
+                                "          \"finish_reason\": \"stop\"",
+                                "        }",
+                                "      }",
+                                "    ]",
+                                "  ],",
+                                "  \"llmOutput\": {",
+                                "    \"tokenUsage\": {",
+                                "      \"completionTokens\": 59,",
+                                "      \"promptTokens\": 772,",
+                                "      \"totalTokens\": 831",
+                                "    }",
+                                "  }",
+                                "}",
+                                "\u001b[32m[tool/start]\u001b[39m [\u001b[90m1:chain:AgentExecutor > \u001b[1m7:tool:Calculator\u001b[22m\u001b[39m] Entering Tool run with input: \"5.10414753513435^2\"",
+                                "\u001b[32m[chain/start]\u001b[39m [\u001b[90m1:chain:AgentExecutor > \u001b[1m8:chain:LLMChain\u001b[22m\u001b[39m] Entering Chain run with input: {",
+                                "  \"input\": \"What is a random number between 5 and 10 raised to the second power?\",",
+                                "  \"agent_scratchpad\": \"This was your previous work (but I haven't seen any of it! I only see what you return as final answer):\\nI can use the random-number-generator tool to generate a random number between 5 and 10. Then I can use the calculator tool to raise that number to the second power.\\n\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"random-number-generator\\\",\\n  \\\"action_input\\\": {\\n    \\\"low\\\": 5,\\n    \\\"high\\\": 10\\n  }\\n}\\n```\\n\\n\\nObservation: 5.10414753513435\\nThought:Now I have a random number between 5 and 10. I can use the calculator tool to raise that number to the second power.\\n\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"calculator\\\",\\n  \\\"action_input\\\": \\\"5.10414753513435^2\\\"\\n}\\n```\\nObservation: 26.052322060418064\\nThought:\",",
+                                "  \"stop\": [",
+                                "    \"Observation:\"",
+                                "  ]",
+                                "}",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:AgentExecutor > 8:chain:LLMChain > \u001b[1m9:llm:ChatOpenAI\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"messages\": [",
+                                "    [",
+                                "      {",
+                                "        \"lc\": 1,",
+                                "        \"type\": \"constructor\",",
+                                "        \"id\": [",
+                                "          \"langchain\",",
+                                "          \"schema\",",
+                                "          \"SystemMessage\"",
+                                "        ],",
+                                "        \"kwargs\": {",
+                                "          \"content\": \"Answer the following questions truthfully and as best you can.\\n\\nYou have access to the following tools.\\nYou must format your inputs to these tools to match their \\\"JSON schema\\\" definitions below.\\n\\n\\\"JSON Schema\\\" is a declarative language that allows you to annotate and validate JSON documents.\\n\\nFor example, the example \\\"JSON Schema\\\" instance {\\\"properties\\\": {\\\"foo\\\": {\\\"description\\\": \\\"a list of test words\\\", \\\"type\\\": \\\"array\\\", \\\"items\\\": {\\\"type\\\": \\\"string\\\"}}}, \\\"required\\\": [\\\"foo\\\"]}}\\nwould match an object with one required property, \\\"foo\\\". The \\\"type\\\" property specifies \\\"foo\\\" must be an \\\"array\\\", and the \\\"description\\\" property semantically describes it as \\\"a list of test words\\\". The items within \\\"foo\\\" must be strings.\\nThus, the object {\\\"foo\\\": [\\\"bar\\\", \\\"baz\\\"]} is a well-formatted instance of this example \\\"JSON Schema\\\". The object {\\\"properties\\\": {\\\"foo\\\": [\\\"bar\\\", \\\"baz\\\"]}} is not well-formatted.\\n\\nHere are the JSON Schema instances for the tools you have access to:\\n\\ncalculator: Useful for getting the result of a math expression. The input to this tool should be a valid mathematical expression that could be executed by a simple calculator., args: {\\\"input\\\":{\\\"type\\\":\\\"string\\\"}}\\nrandom-number-generator: generates a random number between two input numbers, args: {\\\"low\\\":{\\\"type\\\":\\\"number\\\",\\\"description\\\":\\\"The lower bound of the generated number\\\"},\\\"high\\\":{\\\"type\\\":\\\"number\\\",\\\"description\\\":\\\"The upper bound of the generated number\\\"}}\\n\\nThe way you use the tools is as follows:\\n\\n------------------------\\n\\nOutput a JSON markdown code snippet containing a valid JSON blob (denoted below by $JSON_BLOB).\\nThis $JSON_BLOB must have a \\\"action\\\" key (with the name of the tool to use) and an \\\"action_input\\\" key (tool input).\\n\\nValid \\\"action\\\" values: \\\"Final Answer\\\" (which you must use when giving your final response to the user), or one of [calculator, random-number-generator].\\n\\nThe $JSON_BLOB must be valid, parseable JSON and only contain a SINGLE action. Here is an example of an acceptable output:\\n\\n```json\\n{\\n  \\\"action\\\": $TOOL_NAME,\\n  \\\"action_input\\\": $INPUT\\n}\\n```\\n\\nRemember to include the surrounding markdown code snippet delimiters (begin with \\\"```\\\" json and close with \\\"```\\\")!\\n\\n\\nIf you are using a tool, \\\"action_input\\\" must adhere to the tool's input schema, given above.\\n\\n------------------------\\n\\nALWAYS use the following format:\\n\\nQuestion: the input question you must answer\\nThought: you should always think about what to do\\nAction:\\n```json\\n$JSON_BLOB\\n```\\nObservation: the result of the action\\n... (this Thought/Action/Observation can repeat N times)\\nThought: I now know the final answer\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"Final Answer\\\",\\n  \\\"action_input\\\": \\\"Final response to human\\\"\\n}\\n```\\n\\nBegin! Reminder to ALWAYS use the above format, and to use tools if appropriate.\",",
+                                "          \"additional_kwargs\": {}",
+                                "        }",
+                                "      },",
+                                "      {",
+                                "        \"lc\": 1,",
+                                "        \"type\": \"constructor\",",
+                                "        \"id\": [",
+                                "          \"langchain\",",
+                                "          \"schema\",",
+                                "          \"HumanMessage\"",
+                                "        ],",
+                                "        \"kwargs\": {",
+                                "          \"content\": \"What is a random number between 5 and 10 raised to the second power?\\n\\nThis was your previous work (but I haven't seen any of it! I only see what you return as final answer):\\nI can use the random-number-generator tool to generate a random number between 5 and 10. Then I can use the calculator tool to raise that number to the second power.\\n\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"random-number-generator\\\",\\n  \\\"action_input\\\": {\\n    \\\"low\\\": 5,\\n    \\\"high\\\": 10\\n  }\\n}\\n```\\n\\n\\nObservation: 5.10414753513435\\nThought:Now I have a random number between 5 and 10. I can use the calculator tool to raise that number to the second power.\\n\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"calculator\\\",\\n  \\\"action_input\\\": \\\"5.10414753513435^2\\\"\\n}\\n```\\nObservation: 26.052322060418064\\nThought:\",",
+                                "          \"additional_kwargs\": {}",
+                                "        }",
+                                "      }",
+                                "    ]",
+                                "  ]",
+                                "}",
+                                "\u001b[36m[llm/end]\u001b[39m [\u001b[90m1:chain:AgentExecutor > 8:chain:LLMChain > \u001b[1m9:llm:ChatOpenAI\u001b[22m\u001b[39m] [4.16s] Exiting LLM run with output: {",
+                                "  \"generations\": [",
+                                "    [",
+                                "      {",
+                                "        \"text\": \"Now I have the result of raising the random number between 5 and 10 to the second power. I can provide the final answer to the user.\\n\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"Final Answer\\\",\\n  \\\"action_input\\\": \\\"The random number between 5 and 10 raised to the second power is 26.052322060418064.\\\"\\n}\\n```\",",
+                                "        \"message\": {",
+                                "          \"lc\": 1,",
+                                "          \"type\": \"constructor\",",
+                                "          \"id\": [",
+                                "            \"langchain\",",
+                                "            \"schema\",",
+                                "            \"AIMessage\"",
+                                "          ],",
+                                "          \"kwargs\": {",
+                                "            \"content\": \"Now I have the result of raising the random number between 5 and 10 to the second power. I can provide the final answer to the user.\\n\\nAction:\\n```json\\n{\\n  \\\"action\\\": \\\"Final Answer\\\",\\n  \\\"action_input\\\": \\\"The random number between 5 and 10 raised to the second power is 26.052322060418064.\\\"\\n}\\n```\",",
+                                "            \"additional_kwargs\": {}",
+                                "          }",
+                                "        },",
+                                "        \"generationInfo\": {",
+                                "          \"finish_reason\": \"stop\"",
+                                "        }",
+                                "      }",
+                                "    ]",
+                                "  ],",
+                                "  \"llmOutput\": {",
+                                "    \"tokenUsage\": {",
+                                "      \"completionTokens\": 77,",
+                                "      \"promptTokens\": 846,",
+                                "      \"totalTokens\": 923",
+                                "    }",
+                                "  }",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m\u001b[1m1:chain:AgentExecutor\u001b[22m\u001b[39m] [15.82s] Exiting Chain run with output: {",
+                                "  \"output\": \"The random number between 5 and 10 raised to the second power is 26.052322060418064.\"",
+                                "}",
+                                "{",
+                                "  result: {",
+                                "    output: 'The random number between 5 and 10 raised to the second power is 26.052322060418064.'",
+                                "  }",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "import { ChatOpenAI } from \"langchain/chat_models/openai\";\nimport { ConversationalRetrievalQAChain } from \"langchain/chains\";\nimport { HNSWLib } from \"langchain/vectorstores/hnswlib\";\nimport { OpenAIEmbeddings } from \"langchain/embeddings/openai\";\nimport { BufferMemory } from \"langchain/memory\";\n\nconst CUSTOM_QUESTION_GENERATOR_CHAIN_PROMPT = `Given the following conversation and a follow up question, return the conversation history excerpt that includes any relevant context to the question if it exists and rephrase the follow up question to be a standalone question.\nChat History:\n{chat_history}\nFollow Up Input: {question}\nYour answer should follow the following format:\n\\`\\`\\`\nUse the following pieces of context to answer the users question.\nIf you don't know the answer, just say that you don't know, don't try to make up an answer.\n----------------\n<Relevant chat history excerpt as context here>\nStandalone question: <Rephrased question here>\n\\`\\`\\`\nYour answer:`;\n\nconst model = new ChatOpenAI({\n  modelName: \"gpt-3.5-turbo\",\n  temperature: 0,\n});\n\nconst vectorStore = await HNSWLib.fromTexts(\n  [\n    \"Mitochondria are the powerhouse of the cell\",\n    \"Foo is red\",\n    \"Bar is red\",\n    \"Buildings are made out of brick\",\n    \"Mitochondria are made of lipids\",\n  ],\n  [{ id: 2 }, { id: 1 }, { id: 3 }, { id: 4 }, { id: 5 }],\n  new OpenAIEmbeddings()\n);\n\nconst chain = ConversationalRetrievalQAChain.fromLLM(\n  model,\n  vectorStore.asRetriever(),\n  {\n    memory: new BufferMemory({\n      memoryKey: \"chat_history\",\n      returnMessages: true,\n    }),\n    questionGeneratorChainOptions: {\n      template: CUSTOM_QUESTION_GENERATOR_CHAIN_PROMPT,\n    },\n  }\n);\n\nconst res = await chain.call({\n  question:\n    \"I have a friend called Bob. He's 28 years old. He'd like to know what the powerhouse of the cell is?\",\n});\n\nconsole.log(res);\n/*\n  {\n    text: \"The powerhouse of the cell is the mitochondria.\"\n  }\n*/\n\nconst res2 = await chain.call({\n  question: \"How old is Bob?\",\n});\n\nconsole.log(res2); // Bob is 28 years old.\n\n/*\n  {\n    text: \"Bob is 28 years old.\"\n  }\n*/"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "(node:2789) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.",
+                                "(Use `node --trace-warnings ...` to show where the warning was created)",
+                                "{ text: \"Bob's age is 28 years old.\" }",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "{ text: 'The powerhouse of the cell is the mitochondria.' }",
+                                ""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "import { SequentialChain, LLMChain } from \"langchain/chains\";\nimport { OpenAI } from \"langchain/llms/openai\";\nimport { PromptTemplate } from \"langchain/prompts\";\n\n// This is an LLMChain to write a synopsis given a title of a play and the era it is set in.\nconst llm = new OpenAI({ temperature: 0 });\nconst template = `You are a playwright. Given the title of play and the era it is set in, it is your job to write a synopsis for that title.\n\nTitle: {title}\nEra: {era}\nPlaywright: This is a synopsis for the above play:`;\nconst promptTemplate = new PromptTemplate({\n  template,\n  inputVariables: [\"title\", \"era\"],\n});\nconst synopsisChain = new LLMChain({\n  llm,\n  prompt: promptTemplate,\n  outputKey: \"synopsis\",\n});\n\n// This is an LLMChain to write a review of a play given a synopsis.\nconst reviewLLM = new OpenAI({ temperature: 0 });\nconst reviewTemplate = `You are a play critic from the New York Times. Given the synopsis of play, it is your job to write a review for that play.\n  \n   Play Synopsis:\n   {synopsis}\n   Review from a New York Times play critic of the above play:`;\nconst reviewPromptTemplate = new PromptTemplate({\n  template: reviewTemplate,\n  inputVariables: [\"synopsis\"],\n});\nconst reviewChain = new LLMChain({\n  llm: reviewLLM,\n  prompt: reviewPromptTemplate,\n  outputKey: \"review\",\n});\n\nconst overallChain = new SequentialChain({\n  chains: [synopsisChain, reviewChain],\n  inputVariables: [\"era\", \"title\"],\n  // Here we return multiple variables\n  outputVariables: [\"synopsis\", \"review\"],\n  verbose: true,\n});\nconst chainExecutionResult = await overallChain.call({\n  title: \"Tragedy at sunset on the beach\",\n  era: \"Victorian England\",\n});\nconsole.log(chainExecutionResult);"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "\u001b[32m[chain/start]\u001b[39m [\u001b[90m\u001b[1m1:chain:SequentialChain\u001b[22m\u001b[39m] Entering Chain run with input: {",
+                                "  \"title\": \"Tragedy at sunset on the beach\",",
+                                "  \"era\": \"Victorian England\"",
+                                "}",
+                                "\u001b[32m[chain/start]\u001b[39m [\u001b[90m1:chain:SequentialChain > \u001b[1m2:chain:LLMChain\u001b[22m\u001b[39m] Entering Chain run with input: {",
+                                "  \"title\": \"Tragedy at sunset on the beach\",",
+                                "  \"era\": \"Victorian England\"",
+                                "}",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:SequentialChain > 2:chain:LLMChain > \u001b[1m3:llm:OpenAI\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"You are a playwright. Given the title of play and the era it is set in, it is your job to write a synopsis for that title.\\n\\nTitle: Tragedy at sunset on the beach\\nEra: Victorian England\\nPlaywright: This is a synopsis for the above play:\"",
+                                "  ]",
+                                "}",
+                                "\u001b[36m[llm/end]\u001b[39m [\u001b[90m1:chain:SequentialChain > 2:chain:LLMChain > \u001b[1m3:llm:OpenAI\u001b[22m\u001b[39m] [3.93s] Exiting LLM run with output: {",
+                                "  \"generations\": [",
+                                "    [",
+                                "      {",
+                                "        \"text\": \"\\n\\nTragedy at Sunset on the Beach is a play set in Victorian England. It tells the story of a young woman, Emily, who is struggling to make ends meet in a small coastal town. She works as a maid for a wealthy family, but her dreams of a better life are dashed when she discovers that her employer is involved in a scandalous affair.\\n\\nEmily is determined to make a better life for herself, but her plans are thwarted when she meets a handsome stranger on the beach one evening. The two quickly fall in love, but their happiness is short-lived when Emily discovers that the stranger is actually a member of the wealthy family she works for.\\n\\nThe play follows Emily as she struggles to come to terms with the truth and make sense of her life. As the sun sets on the beach, Emily must decide whether to stay with the man she loves or to leave him and pursue her dreams. In the end, Emily must make a heartbreaking decision that will change her life forever.\",",
+                                "        \"generationInfo\": {",
+                                "          \"finishReason\": \"stop\",",
+                                "          \"logprobs\": null",
+                                "        }",
+                                "      }",
+                                "    ]",
+                                "  ],",
+                                "  \"llmOutput\": {",
+                                "    \"tokenUsage\": {",
+                                "      \"completionTokens\": 205,",
+                                "      \"promptTokens\": 62,",
+                                "      \"totalTokens\": 267",
+                                "    }",
+                                "  }",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m1:chain:SequentialChain > \u001b[1m2:chain:LLMChain\u001b[22m\u001b[39m] [4.46s] Exiting Chain run with output: {",
+                                "  \"synopsis\": \"\\n\\nTragedy at Sunset on the Beach is a play set in Victorian England. It tells the story of a young woman, Emily, who is struggling to make ends meet in a small coastal town. She works as a maid for a wealthy family, but her dreams of a better life are dashed when she discovers that her employer is involved in a scandalous affair.\\n\\nEmily is determined to make a better life for herself, but her plans are thwarted when she meets a handsome stranger on the beach one evening. The two quickly fall in love, but their happiness is short-lived when Emily discovers that the stranger is actually a member of the wealthy family she works for.\\n\\nThe play follows Emily as she struggles to come to terms with the truth and make sense of her life. As the sun sets on the beach, Emily must decide whether to stay with the man she loves or to leave him and pursue her dreams. In the end, Emily must make a heartbreaking decision that will change her life forever.\"",
+                                "}",
+                                "\u001b[32m[chain/start]\u001b[39m [\u001b[90m1:chain:SequentialChain > \u001b[1m4:chain:LLMChain\u001b[22m\u001b[39m] Entering Chain run with input: {",
+                                "  \"title\": \"Tragedy at sunset on the beach\",",
+                                "  \"era\": \"Victorian England\",",
+                                "  \"synopsis\": \"\\n\\nTragedy at Sunset on the Beach is a play set in Victorian England. It tells the story of a young woman, Emily, who is struggling to make ends meet in a small coastal town. She works as a maid for a wealthy family, but her dreams of a better life are dashed when she discovers that her employer is involved in a scandalous affair.\\n\\nEmily is determined to make a better life for herself, but her plans are thwarted when she meets a handsome stranger on the beach one evening. The two quickly fall in love, but their happiness is short-lived when Emily discovers that the stranger is actually a member of the wealthy family she works for.\\n\\nThe play follows Emily as she struggles to come to terms with the truth and make sense of her life. As the sun sets on the beach, Emily must decide whether to stay with the man she loves or to leave him and pursue her dreams. In the end, Emily must make a heartbreaking decision that will change her life forever.\"",
+                                "}",
+                                "\u001b[32m[llm/start]\u001b[39m [\u001b[90m1:chain:SequentialChain > 4:chain:LLMChain > \u001b[1m5:llm:OpenAI\u001b[22m\u001b[39m] Entering LLM run with input: {",
+                                "  \"prompts\": [",
+                                "    \"You are a play critic from the New York Times. Given the synopsis of play, it is your job to write a review for that play.\\n  \\n   Play Synopsis:\\n   \\n\\nTragedy at Sunset on the Beach is a play set in Victorian England. It tells the story of a young woman, Emily, who is struggling to make ends meet in a small coastal town. She works as a maid for a wealthy family, but her dreams of a better life are dashed when she discovers that her employer is involved in a scandalous affair.\\n\\nEmily is determined to make a better life for herself, but her plans are thwarted when she meets a handsome stranger on the beach one evening. The two quickly fall in love, but their happiness is short-lived when Emily discovers that the stranger is actually a member of the wealthy family she works for.\\n\\nThe play follows Emily as she struggles to come to terms with the truth and make sense of her life. As the sun sets on the beach, Emily must decide whether to stay with the man she loves or to leave him and pursue her dreams. In the end, Emily must make a heartbreaking decision that will change her life forever.\\n   Review from a New York Times play critic of the above play:\"",
+                                "  ]",
+                                "}",
+                                "\u001b[36m[llm/end]\u001b[39m [\u001b[90m1:chain:SequentialChain > 4:chain:LLMChain > \u001b[1m5:llm:OpenAI\u001b[22m\u001b[39m] [3.26s] Exiting LLM run with output: {",
+                                "  \"generations\": [",
+                                "    [",
+                                "      {",
+                                "        \"text\": \"\\n\\nTragedy at Sunset on the Beach is a captivating and heartbreaking story of love and loss. Set in Victorian England, the play follows Emily, a young woman struggling to make ends meet in a small coastal town. Emily's dreams of a better life are dashed when she discovers her employer is involved in a scandalous affair, and her plans are further thwarted when she meets a handsome stranger on the beach.\\n\\nThe play is a powerful exploration of the human condition, as Emily must grapple with the truth and make a difficult decision that will change her life forever. The performances are outstanding, with the actors bringing a depth of emotion to their characters that is both heartbreaking and inspiring.\\n\\nOverall, Tragedy at Sunset on the Beach is a powerful and moving play that will leave audiences in tears. It is a must-see for anyone looking for a thought-provoking and emotionally charged experience.\",",
+                                "        \"generationInfo\": {",
+                                "          \"finishReason\": \"stop\",",
+                                "          \"logprobs\": null",
+                                "        }",
+                                "      }",
+                                "    ]",
+                                "  ],",
+                                "  \"llmOutput\": {",
+                                "    \"tokenUsage\": {",
+                                "      \"completionTokens\": 184,",
+                                "      \"promptTokens\": 259,",
+                                "      \"totalTokens\": 443",
+                                "    }",
+                                "  }",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m1:chain:SequentialChain > \u001b[1m4:chain:LLMChain\u001b[22m\u001b[39m] [3.75s] Exiting Chain run with output: {",
+                                "  \"review\": \"\\n\\nTragedy at Sunset on the Beach is a captivating and heartbreaking story of love and loss. Set in Victorian England, the play follows Emily, a young woman struggling to make ends meet in a small coastal town. Emily's dreams of a better life are dashed when she discovers her employer is involved in a scandalous affair, and her plans are further thwarted when she meets a handsome stranger on the beach.\\n\\nThe play is a powerful exploration of the human condition, as Emily must grapple with the truth and make a difficult decision that will change her life forever. The performances are outstanding, with the actors bringing a depth of emotion to their characters that is both heartbreaking and inspiring.\\n\\nOverall, Tragedy at Sunset on the Beach is a powerful and moving play that will leave audiences in tears. It is a must-see for anyone looking for a thought-provoking and emotionally charged experience.\"",
+                                "}",
+                                "\u001b[36m[chain/end]\u001b[39m [\u001b[90m\u001b[1m1:chain:SequentialChain\u001b[22m\u001b[39m] [9.00s] Exiting Chain run with output: {",
+                                "  \"synopsis\": \"\\n\\nTragedy at Sunset on the Beach is a play set in Victorian England. It tells the story of a young woman, Emily, who is struggling to make ends meet in a small coastal town. She works as a maid for a wealthy family, but her dreams of a better life are dashed when she discovers that her employer is involved in a scandalous affair.\\n\\nEmily is determined to make a better life for herself, but her plans are thwarted when she meets a handsome stranger on the beach one evening. The two quickly fall in love, but their happiness is short-lived when Emily discovers that the stranger is actually a member of the wealthy family she works for.\\n\\nThe play follows Emily as she struggles to come to terms with the truth and make sense of her life. As the sun sets on the beach, Emily must decide whether to stay with the man she loves or to leave him and pursue her dreams. In the end, Emily must make a heartbreaking decision that will change her life forever.\",",
+                                "  \"review\": \"\\n\\nTragedy at Sunset on the Beach is a captivating and heartbreaking story of love and loss. Set in Victorian England, the play follows Emily, a young woman struggling to make ends meet in a small coastal town. Emily's dreams of a better life are dashed when she discovers her employer is involved in a scandalous affair, and her plans are further thwarted when she meets a handsome stranger on the beach.\\n\\nThe play is a powerful exploration of the human condition, as Emily must grapple with the truth and make a difficult decision that will change her life forever. The performances are outstanding, with the actors bringing a depth of emotion to their characters that is both heartbreaking and inspiring.\\n\\nOverall, Tragedy at Sunset on the Beach is a powerful and moving play that will leave audiences in tears. It is a must-see for anyone looking for a thought-provoking and emotionally charged experience.\"",
+                                "}",
+                                "{",
+                                "  synopsis: '\\n' +",
+                                "    '\\n' +",
+                                "    'Tragedy at Sunset on the Beach is a play set in Victorian England. It tells the story of a young woman, Emily, who is struggling to make ends meet in a small coastal town. She works as a maid for a wealthy family, but her dreams of a better life are dashed when she discovers that her employer is involved in a scandalous affair.\\n' +",
+                                "    '\\n' +",
+                                "    'Emily is determined to make a better life for herself, but her plans are thwarted when she meets a handsome stranger on the beach one evening. The two quickly fall in love, but their happiness is short-lived when Emily discovers that the stranger is actually a member of the wealthy family she works for.\\n' +",
+                                "    '\\n' +",
+                                "    'The play follows Emily as she struggles to come to terms with the truth and make sense of her life. As the sun sets on the beach, Emily must decide whether to stay with the man she loves or to leave him and pursue her dreams. In the end, Emily must make a heartbreaking decision that will change her life forever.',",
+                                "  review: '\\n' +",
+                                "    '\\n' +",
+                                "    \"Tragedy at Sunset on the Beach is a captivating and heartbreaking story of love and loss. Set in Victorian England, the play follows Emily, a young woman struggling to make ends meet in a small coastal town. Emily's dreams of a better life are dashed when she discovers her employer is involved in a scandalous affair, and her plans are further thwarted when she meets a handsome stranger on the beach.\\n\" +",
+                                "    '\\n' +",
+                                "    'The play is a powerful exploration of the human condition, as Emily must grapple with the truth and make a difficult decision that will change her life forever. The performances are outstanding, with the actors bringing a depth of emotion to their characters that is both heartbreaking and inspiring.\\n' +",
+                                "    '\\n' +",
+                                "    'Overall, Tragedy at Sunset on the Beach is a powerful and moving play that will leave audiences in tears. It is a must-see for anyone looking for a thought-provoking and emotionally charged experience.'",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "import { OpenAI } from \"langchain/llms/openai\";\nimport { APIChain } from \"langchain/chains\";\n\nconst OPEN_METEO_DOCS = `BASE URL: https://api.open-meteo.com/\n\nAPI Documentation\nThe API endpoint /v1/forecast accepts a geographical coordinate, a list of weather variables and responds with a JSON hourly weather forecast for 7 days. Time always starts at 0:00 today and contains 168 hours. All URL parameters are listed below:\n\nParameter\tFormat\tRequired\tDefault\tDescription\nlatitude, longitude\tFloating point\tYes\t\tGeographical WGS84 coordinate of the location\nhourly\tString array\tNo\t\tA list of weather variables which should be returned. Values can be comma separated, or multiple &hourly= parameter in the URL can be used.\ndaily\tString array\tNo\t\tA list of daily weather variable aggregations which should be returned. Values can be comma separated, or multiple &daily= parameter in the URL can be used. If daily weather variables are specified, parameter timezone is required.\ncurrent_weather\tBool\tNo\tfalse\tInclude current weather conditions in the JSON output.\ntemperature_unit\tString\tNo\tcelsius\tIf fahrenheit is set, all temperature values are converted to Fahrenheit.\nwindspeed_unit\tString\tNo\tkmh\tOther wind speed speed units: ms, mph and kn\nprecipitation_unit\tString\tNo\tmm\tOther precipitation amount units: inch\ntimeformat\tString\tNo\tiso8601\tIf format unixtime is selected, all time values are returned in UNIX epoch time in seconds. Please note that all timestamp are in GMT+0! For daily values with unix timestamps, please apply utc_offset_seconds again to get the correct date.\ntimezone\tString\tNo\tGMT\tIf timezone is set, all timestamps are returned as local-time and data is returned starting at 00:00 local-time. Any time zone name from the time zone database is supported. If auto is set as a time zone, the coordinates will be automatically resolved to the local time zone.\npast_days\tInteger (0-2)\tNo\t0\tIf past_days is set, yesterday or the day before yesterday data are also returned.\nstart_date\nend_date\tString (yyyy-mm-dd)\tNo\t\tThe time interval to get weather data. A day must be specified as an ISO8601 date (e.g. 2022-06-30).\nmodels\tString array\tNo\tauto\tManually select one or more weather models. Per default, the best suitable weather models will be combined.\n\nVariable\tValid time\tUnit\tDescription\ntemperature_2m\tInstant\t°C (°F)\tAir temperature at 2 meters above ground\nsnowfall\tPreceding hour sum\tcm (inch)\tSnowfall amount of the preceding hour in centimeters. For the water equivalent in millimeter, divide by 7. E.g. 7 cm snow = 10 mm precipitation water equivalent\nrain\tPreceding hour sum\tmm (inch)\tRain from large scale weather systems of the preceding hour in millimeter\nshowers\tPreceding hour sum\tmm (inch)\tShowers from convective precipitation in millimeters from the preceding hour\nweathercode\tInstant\tWMO code\tWeather condition as a numeric code. Follow WMO weather interpretation codes. See table below for details.\nsnow_depth\tInstant\tmeters\tSnow depth on the ground\nfreezinglevel_height\tInstant\tmeters\tAltitude above sea level of the 0°C level\nvisibility\tInstant\tmeters\tViewing distance in meters. Influenced by low clouds, humidity and aerosols. Maximum visibility is approximately 24 km.`;\n\n\nconst model = new OpenAI({ modelName: \"text-davinci-003\" });\nconst chain = APIChain.fromLLMAndAPIDocs(model, OPEN_METEO_DOCS, {\n  headers: {\n    // These headers will be used for API requests made by the chain.\n  },\n});\n\nconst res = await chain.call({\n  question:\n    \"What is the weather like right now in Munich, Germany in degrees Farenheit?\",\n});\nconsole.log({ res });\n"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "{",
+                                "  res: {",
+                                "    output: ' The current weather in Munich, Germany is 72.5 degrees Farenheit, with a windspeed of 1.3 km/h, a winddirection of 236 degrees, a weathercode of 1, and it is currently daytime.'",
+                                "  }",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "import { DataSource } from \"typeorm\";\nimport { OpenAI } from \"langchain/llms/openai\";\nimport { SqlDatabase } from \"langchain/sql_db\";\nimport { SqlDatabaseChain } from \"langchain/chains/sql_db\";\nimport { PromptTemplate } from \"langchain/prompts\";\n\nconst template = `Given an input question, first create a syntactically correct {dialect} query to run, then look at the results of the query and return the answer.\nUse the following format:\n\nQuestion: \"Question here\"\nSQLQuery: \"SQL Query to run\"\nSQLResult: \"Result of the SQLQuery\"\nAnswer: \"Final answer here\"\n\nOnly use the following tables:\n\n{table_info}\n\nIf someone asks for the table foobar, they really mean the employee table.\n\nQuestion: {input}`;\n\nconst prompt = PromptTemplate.fromTemplate(template);\n\n/**\n * This example uses Chinook database, which is a sample database available for SQL Server, Oracle, MySQL, etc.\n * To set it up follow the instructions on https://database.guide/2-sample-databases-sqlite/, placing the .db file\n * in the examples folder.\n */\nconst datasource = new DataSource({\n  type: \"sqlite\",\n  database: \"data/Chinook.db\",\n});\n\nconst db = await SqlDatabase.fromDataSourceParams({\n  appDataSource: datasource,\n});\n\nconst chain = new SqlDatabaseChain({\n  llm: new OpenAI({ temperature: 0 }),\n  database: db,\n  sqlOutputKey: \"sql\",\n  prompt,\n});\n\nconst res = await chain.call({\n  query: \"How many employees are there in the foobar table?\",\n});\nconsole.log(res);\n\n/*\n  {\n    result: ' There are 8 employees in the foobar table.',\n    sql: ' SELECT COUNT(*) FROM Employee;'\n  }\n*/"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stderr",
+                            "value": [
+                                "(node:2137) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.",
+                                "(Use `node --trace-warnings ...` to show where the warning was created)",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "{",
+                                "  result: ' There are 8 employees in the foobar table.',",
+                                "  sql: ' SELECT COUNT(*) FROM Employee;'",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "import { OpenAI } from \"langchain/llms/openai\";\nimport {\n  loadQAStuffChain,\n  loadQAMapReduceChain,\n  loadQARefineChain\n} from \"langchain/chains\";\nimport { Document } from \"langchain/document\";\n\n// This first example uses the `StuffDocumentsChain`.\nconst llmA = new OpenAI({});\nconst chainA = loadQAStuffChain(llmA);\nconst docs = [\n  new Document({ pageContent: \"Harrison went to Harvard.\" }),\n  new Document({ pageContent: \"Ankush went to Princeton.\" }),\n];\nconst resA = await chainA.call({\n  input_documents: docs,\n  question: \"Where did Harrison go to college?\",\n});\nconsole.log({ resA });\n// { resA: { text: ' Harrison went to Harvard.' } }\n\n// This second example uses the `MapReduceChain`.\n// Optionally limit the number of concurrent requests to the language model.\nconst llmB = new OpenAI({ maxConcurrency: 10 });\nconst chainB = loadQAMapReduceChain(llmB);\nconst resB = await chainB.call({\n  input_documents: docs,\n  question: \"Where did Harrison go to college?\",\n});\nconsole.log({ resB });\n// { resB: { text: ' Harrison went to Harvard.' } }"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "(node:7039) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.",
+                                "(Use `node --trace-warnings ...` to show where the warning was created)",
+                                "{ resB: { text: \" I don't know.\" } }",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "{ resA: { text: ' Harrison went to Harvard.' } }",
+                                ""
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "language": "typescript",
+            "source": [
+                "import { DataSource } from \"typeorm\";\nimport { SqlDatabase } from \"langchain/sql_db\";\nimport { RunnableSequence } from \"langchain/schema/runnable\";\nimport { PromptTemplate } from \"langchain/prompts\";\nimport { StringOutputParser } from \"langchain/schema/output_parser\";\nimport { ChatOpenAI } from \"langchain/chat_models/openai\";\n\nconst datasource = new DataSource({\n  type: \"sqlite\",\n  database: \"data/Chinook.db\",\n});\n\nconst db = await SqlDatabase.fromDataSourceParams({\n  appDataSource: datasource,\n});\n\nconst prompt =\n  PromptTemplate.fromTemplate(`Based on the table schema below, write a SQL query that would answer the user's question:\n{schema}\n\nQuestion: {question}\nSQL Query:`);\n\nconst model = new ChatOpenAI();\n\nconst sqlQueryGeneratorChain = RunnableSequence.from([\n  {\n    schema: async () => db.getTableInfo(),\n    question: (input: { question: string }) => input.question,\n  },\n  prompt,\n  model.bind({ stop: [\"\\nSQLResult:\"] }),\n  new StringOutputParser(),\n]);\n\nconst result = await sqlQueryGeneratorChain.invoke({\n  question: \"How many employees are there?\",\n});\n\nconsole.log(result);\n\n/*\n  SELECT COUNT(EmployeeId) AS TotalEmployees FROM Employee\n*/\n\nconst finalResponsePrompt =\n  PromptTemplate.fromTemplate(`Based on the table schema below, question, sql query, and sql response, write a natural language response:\n{schema}\n\nQuestion: {question}\nSQL Query: {query}\nSQL Response: {response}`);\n\nconst fullChain = RunnableSequence.from([\n  {\n    question: (input) => input.question,\n    query: sqlQueryGeneratorChain,\n  },\n  {\n    schema: async () => db.getTableInfo(),\n    question: (input) => input.question,\n    query: (input) => input.query,\n    response: (input) => db.run(input.query),\n  },\n  finalResponsePrompt,\n  model,\n]);\n\nconst finalResponse = await fullChain.invoke({\n  question: \"How many employees are there?\",\n});\n\nconsole.log(finalResponse);\n\n/*\n  AIMessage {\n    content: 'There are 8 employees.',\n    additional_kwargs: { function_call: undefined }\n  }\n*/"
+            ],
+            "outputs": [
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "(node:2504) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.",
+                                "(Use `node --trace-warnings ...` to show where the warning was created)",
+                                "AIMessage {",
+                                "  lc_serializable: true,",
+                                "  lc_kwargs: {",
+                                "    content: 'There are 8 employees.',",
+                                "    additional_kwargs: { function_call: undefined }",
+                                "  },",
+                                "  lc_namespace: [ 'langchain', 'schema' ],",
+                                "  content: 'There are 8 employees.',",
+                                "  name: undefined,",
+                                "  additional_kwargs: { function_call: undefined }",
+                                "}",
+                                ""
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "items": [
+                        {
+                            "mime": "application/vnd.code.notebook.stdout",
+                            "value": [
+                                "SELECT COUNT(*) FROM Employee",
+                                ""
                             ]
                         }
                     ]
