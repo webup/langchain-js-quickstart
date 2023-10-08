@@ -26,6 +26,9 @@ dependencies:
   hnswlib-node:
     specifier: ^2.0.0
     version: 2.0.0
+  js-yaml:
+    specifier: ^4.1.0
+    version: 4.1.0
   langchain:
     specifier: ^0.0.157
     version: 0.0.157(@pinecone-database/pinecone@0.1.6)(@zilliz/milvus2-sdk-node@2.3.2)(axios@1.4.0)(cheerio@1.0.0-rc.12)(hnswlib-node@2.0.0)(typeorm@0.3.17)
